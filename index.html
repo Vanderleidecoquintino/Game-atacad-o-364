@@ -2,33 +2,112 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>ATACADÃO 364 - V9 FINAL - ORIGEM 0,0 CAIXAS</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ATACADÃO 364 - GPS REAL</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;touch-action:none}
+body{background:#000;color:#fff;font-family:Arial;height:100vh;display:flex;flex-direction:column}
+#top{background:#facc15;color:#000;padding:6px;text-align:center;font-size:10px;font-weight:bold}
+#game{flex:1;display:flex;justify-content:center;align-items:center;overflow:hidden}
+#map{display:grid;gap:1px;background:#222;padding:3px;border:2px solid #facc15;border-radius:8px}
+.cell{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:7px}
+.wall{background:#1e40af;border-radius:3px;border:1px solid #60a5fa}
+.path{background:#000}
+.gap{background:#111;border:1px dashed #fb923c}
+.corr{background:#111;border:1px dashed #facc15}
+.caixa{background:#fde68a;color:#000;font-weight:bold;font-size:6px}
+.player{background:#facc15!important;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px #facc15;font-size:14px;z-index:10}
+#controls{background:#000;padding:8px;display:grid;grid-template-columns:65px 65px 65px;gap:8px;justify-content:center;border-top:2px solid #333}
+#controls button{padding:18px;background:#1f2937;color:#facc15;border:2px solid #facc15;border-radius:14px;font-size:20px;font-weight:bold}
+#controls button:active{background:#facc15;color:#000;transform:scale(0.9)}
+#info{font-size:8px;text-align:center;padding:4px;background:#111}
+#gps{font-size:9px;text-align:center;padding:6px;background:#000;color:#22c55e;border-top:1px solid #333;min-height:36px}
+</style>
 </head>
 <body>
-<div id="top"><div>🛒 ATACADÃO 364 - ORIGEM 0,0=CAIXAS/ENTRADA | Mo M+13 | 364 TAM</div><div id="score">X:0 Y:0</div></div>
-<div id="escala">📐 1:100 | ORIGEM 0,0=CAIXAS | BAIA 14M (7x2M WAY) | FRENTE 4M | GAP 3M LARANJA ANDÁVEL | CORR 5M AMARELO ANDÁVEL | ALTURA PEGA 2,5M | TOTAL 107M</div>
-<div id="mapWrap"><div id="mapa">
-<div id="caixas">⬇ CAIXAS - ORIGEM 0,0 - ENTRADA - ARRASTE PRA VER AS 13 BAIAS ⬇</div>
-<div class="origemDot"></div><div class="origemLabel">📍 0,0 ORIGEM</div>
-<div id="player">🛒</div>
-</div></div>
+<div id="top">🛒 ATACADÃO 364 PAC-MAN GPS | ORIGEM 0,0=CAIXAS | 13 BAIAS 4Mx14M | GAP 3M + CORR 5M LIVRE | ALT 2,5M</div>
+<div id="game"><div id="map"></div></div>
+<div id="info">🟦 AZUL=GÔNDOLA PAREDE NÃO PASSA | 🟨 AMARELO TRACEJADO=5M LIVRE | 🟧 LARANJA=3M LIVRE | ORIGEM 0,0 CAIXAS</div>
+<div id="gps">📍 GPS REAL: Aguardando permissão... Clique em Permitir Localização<br>🎮 JOGO: X:0 Y:0</div>
 <div id="controls">
-<div id="pos">POS: X:0 Y:0 - CAIXAS ORIGEM 0,0</div>
-<div class="joy">
-<div></div><button onclick="mover(0,1)">↑</button><div></div>
-<button onclick="mover(-1,0)">←</button><button onclick="coletar()">📦</button><button onclick="mover(1,0)">→</button>
-<div></div><button onclick="mover(0,-1)">↓</button><div></div>
+<div></div><button onclick="mover(0,-1)">↑</button><div></div>
+<button onclick="mover(-1,0)">←</button><button onclick="mover(0,1)">↓</button><button onclick="mover(1,0)">→</button>
+<div></div><button onclick="ativarGPS()" style="grid-column: span 3;background:#22c55e;color:#000;padding:10px;font-size:12px">📍 ATIVAR GPS REAL</button><div></div>
 </div>
-<div id="legend">
-<span style="background:#fde68a">CAIXAS 0,0</span>
-<span style="background:#facc15">CORR 5M</span>
-<span style="background:#fb923c">GAP 3M ANDÁVEL</span>
-<span style="background:#a7f3d0">BAIA 14M</span>
-<span style="background:#fff;border:1px solid #000">2M WAY | 364 TAM</span>
-</div>
-</div>
-<script src="script.js"></script>
+
+<script>
+const COLS=21, ROWS=19;
+let px=10, py=18;
+let gpsAtivo=false;
+const lab=[
+[1,1,1,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[0,0,0,0,0],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[1,1,0,1,0,1,0,1,1],
+[0,0,0,0,0,0,0,0,0],
+[2,2,2,2,2,2,2,2,2],
+];
+
+function criar(){
+const mapDiv=document.getElementById('map');
+mapDiv.style.gridTemplateColumns=`repeat(${COLS},22px)`;
+for(let y=0;y<ROWS;y++){
+ for(let x=0;x<COLS;x++){
+  let cell=document.createElement('div'); cell.className='cell'; cell.id=`c-${x}-${y}`;
+  let v=lab[y][x];
+  if(v==1){cell.classList.add('wall');}
+  else if(v==2){cell.classList.add('caixa'); cell.innerText='0,0';}
+  else { if(y==8) cell.classList.add('corr'); else if(y==17) cell.classList.add('path'); else cell.classList.add('gap'); }
+  mapDiv.appendChild(cell);
+ }
+}
+atualiza();
+}
+
+function atualiza(){
+document.querySelectorAll('.player').forEach(e=>{e.classList.remove('player'); e.innerText=e.classList.contains('caixa')?'0,0':'';});
+let atual=document.getElementById(`c-${px}-${py}`); atual.classList.add('player'); atual.innerText='🛒';
+let local=py==18?'CAIXAS ORIGEM 0,0':py==17?'SAIDA':py==8?'CORR 5M LIVRE':`GAP 3M LIVRE`;
+if(!gpsAtivo) document.getElementById('gps').innerHTML=`📍 GPS REAL: Clique em ATIVAR GPS<br>🎮 JOGO: X:${px} Y:${py} - ${local} | ALT ${2.5}M | Mo M+13 | 364 TAM`;
+}
+
+function mover(dx,dy){
+let nx=px+dx, ny=py+dy; if(nx<0||nx>=COLS||ny<0||ny>=ROWS) return;
+let alvo=document.getElementById(`c-${nx}-${ny}`);
+if(alvo.classList.contains('wall')){ alvo.style.background='#ef4444'; setTimeout(()=>alvo.style.background='',150); navigator.vibrate&&navigator.vibrate(50); return; }
+px=nx; py=ny; atualiza();
+}
+
+function ativarGPS(){
+if(!navigator.geolocation){ document.getElementById('gps').innerText='❌ GPS não suportado'; return; }
+document.getElementById('gps').innerText='📍 Buscando GPS... Permita a localização';
+navigator.geolocation.watchPosition(pos=>{
+ gpsAtivo=true;
+ let lat=pos.coords.latitude.toFixed(6), lng=pos.coords.longitude.toFixed(6), acc=pos.coords.accuracy.toFixed(1);
+ document.getElementById('gps').innerHTML=`📍 GPS REAL: LAT ${lat} | LNG ${lng} | Precisão ${acc}m<br>🎮 JOGO: X:${px} Y:${py} | ORIGEM 0,0 CAIXAS | GAP 3M + CORR 5M LIVRE | Google Maps: https://maps.google.com/?q=${lat},${lng}`;
+}, err=>{
+ document.getElementById('gps').innerHTML=`❌ GPS Erro: ${err.message}<br>Ative a localização do celular`;
+},{enableHighAccuracy:true, maximumAge:0, timeout:10000});
+}
+
+criar();
+document.addEventListener('keydown',e=>{ if(e.key=='ArrowUp') mover(0,-1); if(e.key=='ArrowDown') mover(0,1); if(e.key=='ArrowLeft') mover(-1,0); if(e.key=='ArrowRight') mover(1,0); });
+let sx=0,sy=0;
+document.addEventListener('touchstart',e=>{sx=e.touches[0].clientX; sy=e.touches[0].clientY;});
+document.addEventListener('touchend',e=>{ let dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>Math.abs(dy)){ if(dx>25) mover(1,0); else if(dx<-25) mover(-1,0);} else { if(dy>25) mover(0,1); else if(dy<-25) mover(0,-1);} });
+</script>
 </body>
 </html>

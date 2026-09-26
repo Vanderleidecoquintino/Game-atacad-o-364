@@ -3,23 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>364 V24 MESMO DA FOTO + GPS</title>
+<title>364 V26 COME PONTINHOS</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;height:100dvh;display:flex;flex-direction:column;overflow:hidden;font-family:Arial}
 #gps{background:#052e16;border-bottom:1px solid #22c55e;color:#22c55e;padding:4px;font-size:8px;text-align:center}
-#top{color:#22c55e;background:#000;border-bottom:1px solid #facc15;font-size:9px;padding:4px;text-align:center}
+#top{color:#facc15;background:#000;border-bottom:1px solid #facc15;font-size:9px;padding:4px;text-align:center}
 #game{flex:1;overflow:auto;background:#000;display:flex;justify-content:center}
-#map{display:grid;gap:1px;background:#000;border:2px solid #facc15;width:max-content;height:max-content}
-.cell{width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-size:4px}
+#map{display:grid;gap:1px;background:#000;border:2px solid #facc15;width:max-content}
+.cell{width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-size:5px}
 .wall{background:#1e40af}
-.corr{background:#000}
+.corr{background:#000;color:#facc15;font-size:4px} /* pontinho */
+.caminho{background:#000!important;color:#facc15} /* caminho de pontinhos */
 .caixa{background:#fef9c3;color:#000;font-size:4px}
-.meta{background:#ef4444!important}
-.player{background:#facc15!important;border-radius:50%;border:1px solid #fff;font-size:9px}
+.meta{background:#ef4444!important;color:#fff;animation:pisca 0.6s infinite;font-size:6px;font-weight:bold}
+@keyframes pisca{0%,100%{opacity:1}50%{opacity:0.3}}
+.player{background:#facc15!important;border-radius:50%;border:1px solid #fff;font-size:9px;z-index:10}
 #bottom{background:#000;border-top:1px solid #facc15;padding:6px}
 #controls{display:flex;justify-content:center;gap:5px;flex-wrap:wrap}
-#controls button{height:32px;border-radius:8px;border:1px solid #facc15;font-weight:bold}
+button{height:32px;border-radius:8px;border:1px solid #facc15;font-weight:bold}
 .bm{width:38px;background:#111;color:#facc15}
 .bmiss{width:72px;background:#a855f7;color:#fff;font-size:8px}
 .bway{width:62px;background:#22c55e;color:#000;font-size:8px}
@@ -27,8 +29,8 @@ body{background:#000;color:#fff;height:100dvh;display:flex;flex-direction:column
 </style>
 </head>
 <body>
-<div id="gps">📍 GPS: Toque no 📍GPS REAL - VOLTA TOTAL OK</div>
-<div id="top">B2 X:3 Y:8 | INDO PRA X:3 Y:15 | AUTO ON | 105/364</div>
+<div id="gps">🟡 COME PONTINHOS | VOLTA TOTAL SEM BATER</div>
+<div id="top">B2 X:3 Y:8 | 105/364 | COME TUDO</div>
 <div id="game"><div id="map"></div></div>
 <div id="bottom">
 <div id="controls">
@@ -36,42 +38,53 @@ body{background:#000;color:#fff;height:100dvh;display:flex;flex-direction:column
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<button class="bmiss" onclick="irPara(38,1)">🎯 MISSÃO 364</button>
-<button class="bway" onclick="irPara(3,15)">📦 WAY 1</button>
+<button class="bmiss" onclick="irPara(38,1)">🎯 TANG 364</button>
+<button class="bway" onclick="irPara(2,16)">📦 WAY 1</button>
 </div>
 <div style="display:flex;justify-content:center;margin-top:4px">
 <button class="bgps" onclick="ativarGPS()">📍 GPS</button>
 </div>
-<div style="font-size:6px;text-align:center;color:#666;margin-top:3px">364 POSIÇÕES | VOLTA TOTAL CIMA+BAIXO+LAT+MEIO | CAIXAS 0,0</div>
 </div>
 <script>
-const COLS=40, ROWS=19; let px=3,py=8, tx=3,ty=15, caminho=[], auto=null, lat=0,lng=0;
+const COLS=40, ROWS=19; let px=3,py=8, tx=3,ty=15, caminho=[], auto=null;
 let lab=[]; for(let y=0;y<ROWS;y++){lab[y]=[]; for(let x=0;x<COLS;x++){ if(y==18 && x>=20 && x<=33) lab[y][x]=2; else if(y==0||y==8||y==17||x==0||x==COLS-1) lab[y][x]=0; else lab[y][x]=(x%5<3)?1:0; }}
-function criar(){const m=document.getElementById('map'); m.style.gridTemplateColumns=`repeat(${COLS},15px)`; for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){let c=document.createElement('div'); c.className='cell'; c.id=`c-${x}-${y}`; let v=lab[y][x]; if(v==1){c.classList.add('wall'); if(y==1) c.innerText=`B${Math.floor(x/5)+1}`; c.style.color='#6aa';} else if(v==2){c.classList.add('caixa'); c.innerText='0,0';} else c.classList.add('corr'); m.appendChild(c);} let rota=achar(px,py,tx,ty); if(rota){caminho=rota; document.getElementById(`c-${tx}-${ty}`).classList.add('meta'); document.getElementById(`c-${tx}-${ty}`).innerText='Way1'; auto=setInterval(step,180);} atualiza();}
-function livre(x,y){if(x<0||x>=COLS||y<0||y>=ROWS) return false; return!document.getElementById(`c-${x}-${y}`).classList.contains('wall');}
+function criar(){
+ const m=document.getElementById('map'); m.style.gridTemplateColumns=`repeat(${COLS},15px)`;
+ for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+  let c=document.createElement('div'); c.className='cell'; c.id=`c-${x}-${y}`; let v=lab[y][x];
+  if(v==1){c.classList.add('wall'); if(y==1) c.innerText=`B${Math.floor(x/5)+1}`; c.style.color='#6aa';}
+  else if(v==2){c.classList.add('caixa'); c.innerText='0,0';}
+  else {c.classList.add('corr'); c.innerText='•';} /* pontinho em todo corredor */
+ }
+ let rota=achar(px,py,tx,ty); if(rota){caminho=rota; mostrarCaminho(); auto=setInterval(step,160);}
+ atualiza();
+}
+function livre(x,y){if(x<0||x>=COLS||y<0||y>=ROWS) return false; let el=document.getElementById(`c-${x}-${y}`); return el &&!el.classList.contains('wall');}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}]; let vis=new Set([`${sx},${sy}`]); let d=[[1,0],[-1,0],[0,1],[0,-1]]; while(q.length){let c=q.shift(); if(c.x==ex&&c.y==ey) return c.p; for(let [dx,dy] of d){let nx=c.x+dx,ny=c.y+dy,k=`${nx},${ny}`; if(!vis.has(k)&&livre(nx,ny)){vis.add(k); q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}} return null;}
-function step(){if(caminho.length==0){clearInterval(auto); auto=null; return;} let pr=caminho.shift(); px=pr.x; py=pr.y; atualiza(); if(px==tx&&py==ty){clearInterval(auto); auto=null; document.getElementById('top').innerText=`✅ CHEGOU WAY 1 B${Math.floor(px/5)+1} X:${px} Y:${py}`;}}
-function atualiza(){document.querySelectorAll('.player').forEach(e=>e.classList.remove('player')); let el=document.getElementById(`c-${px}-${py}`); el.classList.add('player'); el.innerText='🟡'; let pos=px+py*19; document.getElementById('top').innerText=`B${Math.floor(px/5)+1} X:${px} Y:${py} | ${tx!=null?`🎯 INDO PRA X:${tx} Y:${ty} | AUTO ON | ${pos}/364`:`MANUAL ${pos}/364`}`; document.getElementById('game').scrollTop=(py*15)-100;}
-function mover(dx,dy){if(auto)clearInterval(auto); auto=null; tx=null; let nx=px+dx,ny=py+dy; if(!livre(nx,ny)) return; px=nx; py=ny; atualiza();}
+function mostrarCaminho(){document.querySelectorAll('.caminho').forEach(e=>e.classList.remove('caminho')); caminho.forEach(p=>{let el=document.getElementById(`c-${p.x}-${p.y}`); if(el &&!el.classList.contains('meta')){ el.classList.add('caminho'); el.innerText='•'; } });}
+function step(){
+ if(caminho.length==0){clearInterval(auto); auto=null; return;}
+ let pr=caminho.shift(); px=pr.x; py=pr.y;
+ // COME O PONTINHO
+ let el=document.getElementById(`c-${px}-${py}`); if(el) el.innerText='';
+ atualiza();
+ if(px==tx&&py==ty){clearInterval(auto); auto=null; document.getElementById('top').innerText=`✅ COMEU TUDO CHEGOU ${tx==38?'TANG 364':'WAY 1'} X:${px} Y:${py}`; document.querySelectorAll('.meta').forEach(e=>e.classList.remove('meta')); }
+}
+function atualiza(){
+ document.querySelectorAll('.player').forEach(e=>{let id=e.id; let el=document.getElementById(id); if(el.classList.contains('caixa')) el.innerText='0,0'; else if(el.classList.contains('wall')){} else if(el.classList.contains('corr')||el.classList.contains('caminho')){/* mantém pontinho se não comeu */} else el.innerText=''; el.classList.remove('player');});
+ let cur=document.getElementById(`c-${px}-${py}`); cur.classList.add('player'); cur.innerText='🟡';
+ let pos=px+py*19; document.getElementById('top').innerText=`B${Math.floor(px/5)+1} X:${px} Y:${py} | 🎯 INDO X:${tx} Y:${ty} | ${pos}/364 | COMENDO •`;
+ document.getElementById('game').scrollTop=(py*15)-100;
+}
+function mover(dx,dy){ if(auto)clearInterval(auto); auto=null; let nx=px+dx,ny=py+dy; if(!livre(nx,ny)) return; // não bate, só não vai
+ px=nx; py=ny; let el=document.getElementById(`c-${px}-${py}`); if(el) el.innerText=''; atualiza(); }
 function irPara(x,y){
- if(auto)clearInterval(auto);
- document.querySelectorAll('.meta').forEach(e=>e.classList.remove('meta'));
- tx=x; ty=y;
- let rota=achar(px,py,x,y);
- if(!rota){document.getElementById('top').innerText=`SEM CAMINHO`; return;}
- caminho=rota;
- document.getElementById(`c-${x}-${y}`).classList.add('meta');
- document.getElementById(`c-${x}-${y}`).innerText= x==38? '364' : 'Way1';
- auto=setInterval(step,180);
+ if(auto)clearInterval(auto); document.querySelectorAll('.meta').forEach(e=>e.classList.remove('meta')); tx=x; ty=y;
+ let rota=achar(px,py,x,y); if(!rota) return; caminho=rota; mostrarCaminho();
+ let dest=document.getElementById(`c-${x}-${y}`); dest.classList.add('meta'); dest.innerText= x==38?'364':'WAY1';
+ auto=setInterval(step,160);
 }
-function ativarGPS(){
- if(!navigator.geolocation){document.getElementById('gps').innerText='Sem GPS'; return;}
- document.getElementById('gps').innerText='Buscando GPS... Permita';
- navigator.geolocation.getCurrentPosition(p=>{
-  lat=p.coords.latitude; lng=p.coords.longitude;
-  document.getElementById('gps').innerText=`📍 GPS REAL: ${lat.toFixed(5)},${lng.toFixed(5)} | B${Math.floor(px/5)+1} X:${px} Y:${py}`;
- });
-}
+function ativarGPS(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(p=>{document.getElementById('gps').innerText=`📍 ${p.coords.latitude.toFixed(5)},${p.coords.longitude.toFixed(5)} | COMENDO PONTINHOS`;});}
 criar();
 </script>
 </body>

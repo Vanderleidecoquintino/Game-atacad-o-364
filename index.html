@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V35 V9+GPS</title>
+<title>V37 V9 CAMERA FOLLOW</title>
 <style>
-body{background:#000;margin:0;color:#fff;font-family:Arial}
+body{background:#000;margin:0;color:#fff;font-family:Arial;overflow:hidden}
 #gps{background:#052e16;color:#22c55e;padding:8px;text-align:center;font-size:11px;border-bottom:2px solid #22c55e}
 canvas{border:3px solid #facc15;background:#000;display:block;margin:5px auto}
 .btns{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:8px}
 button{height:36px;border-radius:8px;border:2px solid #facc15;font-weight:bold;font-size:10px}
 .bm{width:42px;background:#222;color:#facc15}
 .bprod{width:90px;background:#a855f7;color:#fff}
-.bway{width:90px;background:#22c55e;color:#000}
-.bgps{width:90px;background:#22c55e;color:#000}
+.bway{width:95px;background:#22c55e;color:#000}
+.bgps{width:80px;background:#22c55e;color:#000}
 </style>
 </head>
 <body>
-<div id="gps">📍 AGUARDANDO GPS...</div>
+<div id="gps">🛰️ V37 CAMERA FOLLOW</div>
 <div id="top" style="text-align:center;color:#facc15;font-size:10px;padding:4px"></div>
 <canvas id="c" width="800" height="380"></canvas>
 <div class="btns">
@@ -27,34 +27,44 @@ button{height:36px;border-radius:8px;border:2px solid #facc15;font-weight:bold;f
 <button class="bm" onclick="mover(1,0)">→</button>
 <button class="bprod" onclick="ir(38,1)">TANG 364</button>
 <button class="bprod" onclick="ir(35,1)">PROD 340</button>
-<button class="bway" onclick="ir(2,17)">📦 WAY 1</button>
+<button class="bway" onclick="ir(0,16)">📦 WAY</button>
 <button class="bgps" onclick="ligarGPS()">🛰️ GPS</button>
 </div>
-
 <script>
 const COLS=40,ROWS=19,W=20,H=20;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-let px=3,py=8,tx=2,ty=17,cam=[],tm=null,lab=[],dot=[],gpsOn=false;
+let px=0,py=16,tx=0,ty=16,cam=[],tm=null,lab=[],dot=[];
+let camX=0,camY=0;
 for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){lab[y][x]=(y==0||y==8||y==17||x==0||x==39)?0:(x%5<3)?1:0;dot[y][x]=lab[y][x]==0;}}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
-function draw(){ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}}ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();document.getElementById('top').innerText=`B${Math.floor(px/5)+1} X:${px} Y:${py} → DESTINO X:${tx} Y:${ty}`;}
-function step(){if(cam.length==0){clearInterval(tm);tm=null;document.getElementById('gps').innerText=`✅ CHEGOU X:${tx} Y:${ty} - CLIQUE NO PROXIMO PRODUTO`;return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;cam=achar(px,py,x,y);document.getElementById('gps').innerText=`🚀 INDO PARA X:${x} Y:${y} - ${cam.length} passos`;if(cam.length==0){document.getElementById('gps').innerText=`❌ BLOQUEADO X:${x} Y:${y} É PAREDE`;return;}tm=setInterval(step,150);draw();}
-function ligarGPS(){
- if(!navigator.geolocation){document.getElementById('gps').innerText='❌ SEM GPS NESSE CELULAR';return;}
- document.getElementById('gps').innerText='🛰️ LIGANDO GPS...';
- navigator.geolocation.watchPosition(pos=>{
-  gpsOn=true;
-  let lat=pos.coords.latitude.toFixed(6);
-  let lon=pos.coords.longitude.toFixed(6);
-  document.getElementById('gps').innerText=`🛰️ GPS ON | LAT:${lat} LON:${lon} | X:${px} Y:${py}`;
- },err=>{
-  document.getElementById('gps').innerText='⚠️ GPS DESLIGADO - MODO MANUAL ATIVO';
- },{enableHighAccuracy:true});
+function updateCamera(){
+// CAMERA SEGUE O BONECO
+  camX = px*W - cv.width/2 + W/2;
+  camY = py*H - cv.height/2 + H/2;
+  camX = Math.max(0, Math.min(camX, COLS*W - cv.width));
+  camY = Math.max(0, Math.min(camY, ROWS*H - cv.height));
 }
-draw();
+function draw(){
+  updateCamera();
+  ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);
+  ctx.save();
+  ctx.translate(-camX,-camY);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}
+    else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}
+  }
+  ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);
+  ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+  document.getElementById('top').innerText=`B${Math.floor(px/5)+1} X:${px} Y:${py} → WAY X:${tx} Y:${ty} | CAM X:${Math.round(camX)} Y:${Math.round(camY)}`;
+}
+function step(){if(cam.length==0){clearInterval(tm);tm=null;document.getElementById('gps').innerText=`✅ CHEGOU WAY X:${tx} Y:${ty}`;return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
+function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;draw();}
+function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;cam=achar(px,py,x,y);document.getElementById('gps').innerText=`🚀 INDO X:${x} Y:${y} ${cam.length} passos`;if(cam.length==0){draw();return;}tm=setInterval(step,150);draw();}
+function ligarGPS(){if(!navigator.geolocation)return;navigator.geolocation.watchPosition(p=>{document.getElementById('gps').innerText=`🛰️ LAT:${p.coords.latitude.toFixed(6)} LON:${p.coords.longitude.toFixed(6)} | X:${px} Y:${py}`;},{},{enableHighAccuracy:true});}
+draw();ligarGPS();
 </script>
 </body>
 </html>

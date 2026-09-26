@@ -2,42 +2,33 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Atacadão 364 - V2</title>
-<style>
-  body { background:#0f172a; color:white; font-family:Arial; text-align:center; margin:0; padding:10px; }
-  #gameBox { width:95%; max-width:400px; height:450px; margin:10px auto; border:4px solid #facc15; border-radius:15px; background:#1e3a8a; position:relative; overflow:hidden; }
-  .corredor { position:absolute; width:18%; height:100%; background:#1e40af; top:0; }
-  #player { position:absolute; font-size:32px; transition:all 0.2s; z-index:10; }
-  #camera { position:absolute; width:50px; height:50px; background:white; border-radius:8px; opacity:0.9; }
-  #slider { width:90%; accent-color:#facc15; }
-  .btn { width:90%; padding:15px; border:none; border-radius:10px; font-weight:bold; margin:5px; }
-  .btn-gps { background:#22c55e; color:white; } .btn-entrada { background:#facc15; color:black; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ATACADÃO 364 - V9 FINAL - ORIGEM 0,0 CAIXAS</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>🛒 ATACADÃO 364 GPS - V2</h2>
-<div id="gameBox">
-  <div class="corredor" style="left:20%"></div>
-  <div class="corredor" style="left:45%"></div>
-  <div class="corredor" style="left:70%"></div>
-  <div id="camera"></div>
-  <div id="player">🛒</div>
+<div id="top"><div>🛒 ATACADÃO 364 - ORIGEM 0,0=CAIXAS/ENTRADA | Mo M+13 | 364 TAM</div><div id="score">X:0 Y:0</div></div>
+<div id="escala">📐 1:100 | ORIGEM 0,0=CAIXAS | BAIA 14M (7x2M WAY) | FRENTE 4M | GAP 3M LARANJA ANDÁVEL | CORR 5M AMARELO ANDÁVEL | ALTURA PEGA 2,5M | TOTAL 107M</div>
+<div id="mapWrap"><div id="mapa">
+<div id="caixas">⬇ CAIXAS - ORIGEM 0,0 - ENTRADA - ARRASTE PRA VER AS 13 BAIAS ⬇</div>
+<div class="origemDot"></div><div class="origemLabel">📍 0,0 ORIGEM</div>
+<div id="player">🛒</div>
+</div></div>
+<div id="controls">
+<div id="pos">POS: X:0 Y:0 - CAIXAS ORIGEM 0,0</div>
+<div class="joy">
+<div></div><button onclick="mover(0,1)">↑</button><div></div>
+<button onclick="mover(-1,0)">←</button><button onclick="coletar()">📦</button><button onclick="mover(1,0)">→</button>
+<div></div><button onclick="mover(0,-1)">↓</button><div></div>
 </div>
-<input type="range" id="slider" min="0" max="300" value="0">
-<h3 id="pos">POSIÇÃO: 0</h3>
-<p id="gpsStatus">📡 GPS desligado</p>
-<button class="btn btn-gps" onclick="ligarGPS()">📍 LIGAR MEU GPS REAL</button>
-<button class="btn btn-entrada">🏁 ENTRADA Apos 364</button>
-<div id="confetti" style="display:none; font-size:24px;">🎉 ENTRADA Apos 364 LIBERADA! 🎉</div>
-<script>
-let pos=0, lastVoz=0;
-const player=document.getElementById('player'), camera=document.getElementById('camera'), posText=document.getElementById('pos'), slider=document.getElementById('slider'), gpsStatus=document.getElementById('gpsStatus');
-function fala(t){ if('speechSynthesis' in window){ let u=new SpeechSynthesisUtterance(t); u.lang='pt-BR'; speechSynthesis.speak(u);} }
-function atualizar(t){ pos=t; if(pos>300)pos=300; posText.innerText='POSIÇÃO: '+pos; slider.value=pos; let x=10+(pos%80), y=20+Math.floor(pos/2); if(y>380)y=380; player.style.left=x+'%'; player.style.top=y+'px'; camera.style.left=(x-2)+'%'; camera.style.top=(y-5)+'px'; if(pos>280){ document.getElementById('confetti').style.display='block'; if(pos==281)fala('Entrada Apos trezentos e sessenta e quatro liberada!'); } else { if(pos>50&&lastVoz<50){fala('Vire à esquerda, corredor do whey'); lastVoz=50;} if(pos>120&&lastVoz<120){fala('Siga em frente, corredor de suplementos'); lastVoz=120;} } }
-slider.addEventListener('input', e=>atualizar(parseInt(e.target.value)));
-function ligarGPS(){ gpsStatus.innerHTML='✅ GPS ATIVO - Carrinho com voz!'; fala('GPS do Atacadão ligado'); if(navigator.geolocation){ navigator.geolocation.watchPosition(p=>{ gpsStatus.innerHTML=`✅ GPS ATIVO - Precisão ${Math.round(p.coords.accuracy)}m`; atualizar(pos+2); }, err=>{ setInterval(()=>{ if(pos<300)atualizar(pos+1); },300); }, {enableHighAccuracy:true}); } else { setInterval(()=>atualizar(pos+1),400);} }
-atualizar(0);
-</script>
+<div id="legend">
+<span style="background:#fde68a">CAIXAS 0,0</span>
+<span style="background:#facc15">CORR 5M</span>
+<span style="background:#fb923c">GAP 3M ANDÁVEL</span>
+<span style="background:#a7f3d0">BAIA 14M</span>
+<span style="background:#fff;border:1px solid #000">2M WAY | 364 TAM</span>
+</div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>

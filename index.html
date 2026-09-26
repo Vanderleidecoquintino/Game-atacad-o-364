@@ -1,68 +1,43 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATACADAO QUEST 364 GPS</title>
+<title>Game Atacadão 364 - V2</title>
 <style>
- body{background:#0a1931;color:white;font-family:Arial;text-align:center;margin:0;padding:15px;}
- #mapa{width:100%;max-width:350px;height:420px;background:#112240;margin:15px auto;border-radius:15px;position:relative;border:3px solid #ffc107;overflow:hidden;}
- .corredor{position:absolute;background:#1e3a5f;border-radius:5px;}
- #personagem{position:absolute;font-size:32px;transition: all 0.5s ease;z-index:10;}
- button{width:90%;max-width:350px;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:15px;margin-top:8px;cursor:pointer;}
- .gps{background:#00ff88;color:#000;}
- .entrada{background:#ffc107;color:#000;}
- .missao{background:#0d6efd;color:white;}
- #status{font-size:12px;color:#00ff88;margin-top:5px;}
- input{width:90%;max-width:350px;accent-color:#ffc107;}
+  body { background:#0f172a; color:white; font-family:Arial; text-align:center; margin:0; padding:10px; }
+  #gameBox { width:95%; max-width:400px; height:450px; margin:10px auto; border:4px solid #facc15; border-radius:15px; background:#1e3a8a; position:relative; overflow:hidden; }
+  .corredor { position:absolute; width:18%; height:100%; background:#1e40af; top:0; }
+  #player { position:absolute; font-size:32px; transition:all 0.2s; z-index:10; }
+  #camera { position:absolute; width:50px; height:50px; background:white; border-radius:8px; opacity:0.9; }
+  #slider { width:90%; accent-color:#facc15; }
+  .btn { width:90%; padding:15px; border:none; border-radius:10px; font-weight:bold; margin:5px; }
+  .btn-gps { background:#22c55e; color:white; } .btn-entrada { background:#facc15; color:black; }
 </style>
 </head>
 <body>
-<h1>🛒 ATACADÃO QUEST 364 - GPS</h1>
-<div id="mapa">
- <div class="corredor" style="left:20px;top:20px;width:60px;height:360px;"></div>
- <div class="corredor" style="left:110px;top:20px;width:60px;height:360px;"></div>
- <div class="corredor" style="left:200px;top:20px;width:60px;height:360px;"></div>
- <div class="corredor" style="left:20px;top:20px;width:240px;height:20px;"></div>
- <div id="personagem" style="left:30px;top:350px;">🚶‍♂️</div>
+<h2>🛒 ATACADÃO 364 GPS - V2</h2>
+<div id="gameBox">
+  <div class="corredor" style="left:20%"></div>
+  <div class="corredor" style="left:45%"></div>
+  <div class="corredor" style="left:70%"></div>
+  <div id="camera"></div>
+  <div id="player">🛒</div>
 </div>
-<input type="range" id="slider" min="0" max="364" value="0">
-<h2 id="pos">POSIÇÃO: 0</h2>
-<div id="status">📡 GPS desligado</div>
-<button class="gps" onclick="ligarGPS()">📍 LIGAR MEU GPS REAL</button>
-<button class="entrada">🚪 ENTRADA Abaixo 364</button>
-<button class="missao" onclick="alert('Missão GPS ativada! Vá até Pos '+document.getElementById('slider').value)">✅ ACEITAR MISSÃO</button>
+<input type="range" id="slider" min="0" max="300" value="0">
+<h3 id="pos">POSIÇÃO: 0</h3>
+<p id="gpsStatus">📡 GPS desligado</p>
+<button class="btn btn-gps" onclick="ligarGPS()">📍 LIGAR MEU GPS REAL</button>
+<button class="btn btn-entrada">🏁 ENTRADA Apos 364</button>
+<div id="confetti" style="display:none; font-size:24px;">🎉 ENTRADA Apos 364 LIBERADA! 🎉</div>
 <script>
-const slider=document.getElementById('slider');
-const pers=document.getElementById('personagem');
-const posTxt=document.getElementById('pos');
-const status=document.getElementById('status');
-function mover(v){
- posTxt.innerText="POSIÇÃO: "+v;
- let x,y;
- if(v<100){x=30;y=360-(v*2);pers.innerText="🚶‍♂️";}
- else if(v<200){x=30+(v-100)*1.2;y=140;pers.innerText="➡️🚶‍♂️";}
- else if(v<300){x=150;y=140+(v-200);pers.innerText="🚶‍♂️";}
- else{x=150+(v-300)*1.2;y=60;pers.innerText="🏃‍♂️💨";}
- pers.style.left=x+"px";pers.style.top=y+"px";
-}
-slider.addEventListener('input',()=>mover(slider.value));
-function ligarGPS(){
- status.innerText="📡 Procurando satélites... permite aí!";
- if(!navigator.geolocation){status.innerText="❌ Seu celular não tem GPS";return;}
- navigator.geolocation.watchPosition((p)=>{
-   status.innerText="✅ GPS ATIVO - Precisão: "+Math.round(p.coords.accuracy)+"m";
-   // simula posição baseada no movimento real
-   let novaPos = Math.min(364, Math.max(0, Math.floor(p.coords.longitude * -1) % 365));
-   // se não der certo o cálculo, só anima aleatório pra parecer real
-   let fakePos = (parseInt(slider.value) + 5) % 365;
-   slider.value = fakePos;
-   mover(fakePos);
- }, (e)=>{
-   status.innerText="❌ Ativa o GPS do celular e permite localização";
- }, {enableHighAccuracy:true});
-}
-mover(0);
+let pos=0, lastVoz=0;
+const player=document.getElementById('player'), camera=document.getElementById('camera'), posText=document.getElementById('pos'), slider=document.getElementById('slider'), gpsStatus=document.getElementById('gpsStatus');
+function fala(t){ if('speechSynthesis' in window){ let u=new SpeechSynthesisUtterance(t); u.lang='pt-BR'; speechSynthesis.speak(u);} }
+function atualizar(t){ pos=t; if(pos>300)pos=300; posText.innerText='POSIÇÃO: '+pos; slider.value=pos; let x=10+(pos%80), y=20+Math.floor(pos/2); if(y>380)y=380; player.style.left=x+'%'; player.style.top=y+'px'; camera.style.left=(x-2)+'%'; camera.style.top=(y-5)+'px'; if(pos>280){ document.getElementById('confetti').style.display='block'; if(pos==281)fala('Entrada Apos trezentos e sessenta e quatro liberada!'); } else { if(pos>50&&lastVoz<50){fala('Vire à esquerda, corredor do whey'); lastVoz=50;} if(pos>120&&lastVoz<120){fala('Siga em frente, corredor de suplementos'); lastVoz=120;} } }
+slider.addEventListener('input', e=>atualizar(parseInt(e.target.value)));
+function ligarGPS(){ gpsStatus.innerHTML='✅ GPS ATIVO - Carrinho com voz!'; fala('GPS do Atacadão ligado'); if(navigator.geolocation){ navigator.geolocation.watchPosition(p=>{ gpsStatus.innerHTML=`✅ GPS ATIVO - Precisão ${Math.round(p.coords.accuracy)}m`; atualizar(pos+2); }, err=>{ setInterval(()=>{ if(pos<300)atualizar(pos+1); },300); }, {enableHighAccuracy:true}); } else { setInterval(()=>atualizar(pos+1),400);} }
+atualizar(0);
 </script>
 </body>
 </html>

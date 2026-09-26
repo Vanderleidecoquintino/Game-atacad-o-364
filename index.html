@@ -5,16 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{background:#000;margin:0;color:#fff;font-family:Arial}
-#gps{background:#052e16;color:#22c55e;padding:6px;text-align:center;font-size:11px;border-bottom:1px solid #22c55e}
+#gps{background:#052e16;color:#22c55e;padding:6px;text-align:center;font-size:11px}
 canvas{border:3px solid #facc15;background:#000;display:block;margin:5px auto}
-.btns{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:8px}
-button{height:36px;border-radius:8px;border:2px solid #facc15;font-weight:bold}
-.bm{width:44px;background:#222;color:#facc15}
-.bmiss{width:78px;background:#a855f7;color:#fff;font-size:9px}
+.btns{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:8px}
+button{height:34px;border-radius:8px;border:2px solid #facc15;font-weight:bold;font-size:10px}
+.bm{width:42px;background:#222;color:#facc15}
+.bprod{width:90px;background:#a855f7;color:#fff}
+.bway{width:90px;background:#22c55e;color:#000}
 </style>
 </head>
 <body>
-<div id="gps">📍 AGUARDANDO GPS...</div>
+<div id="gps">📍 MANUAL - CLIQUE NO PRODUTO</div>
 <div id="top" style="text-align:center;color:#facc15;font-size:10px;padding:4px"></div>
 <canvas id="c" width="800" height="380"></canvas>
 <div class="btns">
@@ -22,46 +23,24 @@ button{height:36px;border-radius:8px;border:2px solid #facc15;font-weight:bold}
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<button class="bmiss" onclick="ir(38,1)">🎯 TANG 364</button>
-<button class="bmiss" onclick="ir(2,16)" style="background:#22c55e;color:#000">📦 WAY 1</button>
+<button class="bprod" onclick="ir(38,1)">TANG 364</button>
+<button class="bprod" onclick="ir(35,1)">PROD 340</button>
+<button class="bprod" onclick="ir(20,9)">PROD 180</button>
+<button class="bway" onclick="ir(2,16)">📦 WAY 1</button>
 </div>
-<div style="text-align:center"><button style="width:100px;background:#22c55e;color:#000" onclick="ativarGPS()">📍 ATIVAR GPS</button></div>
 
 <script>
 const COLS=40,ROWS=19,W=20,H=20;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-let px=3,py=8,tx=2,ty=16,cam=[],tm=null;
-let lab=[],dot=[];
+let px=3,py=8,tx=2,ty=16,cam=[],tm=null,lab=[],dot=[];
 for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){lab[y][x]=(y==0||y==8||y==17||x==0||x==39)?0:(x%5<3)?1:0;dot[y][x]=lab[y][x]==0;}}
-
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
-
-function draw(){
-ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);
-for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
- if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}
- else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}
-}
-ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);
-ctx.fillStyle='#fff';ctx.font='bold 7px Arial';ctx.fillText(tx==38?'364':'WAY1',tx*W+2,ty*H+12);
-ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
-let pos=px+py*19;document.getElementById('top').innerText=`B${Math.floor(px/5)+1} X:${px} Y:${py} | INDO X:${tx} Y:${ty} | ${pos}/364 | COME •`;
-}
-
-function step(){if(cam.length==0){clearInterval(tm);tm=null;return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();if(px==tx&&py==ty){clearInterval(tm);tm=null;}}
-function mover(dx,dy){if(tm)clearInterval(tm);let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){if(tm)clearInterval(tm);tx=x;ty=y;cam=achar(px,py,x,y);tm=setInterval(step,150);draw();}
-function ativarGPS(){
- document.getElementById('gps').innerText='📍 BUSCANDO GPS...';
- if(!navigator.geolocation){document.getElementById('gps').innerText='GPS NAO SUPORTADO';return;}
- navigator.geolocation.watchPosition(p=>{
-  document.getElementById('gps').innerText=`📍 ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)} | PREC ${Math.round(p.coords.accuracy)}m | COME PONTINHO`;
- },e=>{document.getElementById('gps').innerText='ERRO GPS: '+e.message},{enableHighAccuracy:true});
-}
+function draw(){ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}}ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();document.getElementById('top').innerText=`B${Math.floor(px/5)+1} X:${px} Y:${py} → DESTINO X:${tx} Y:${ty} | CLIQUE NO PRODUTO`;}
+function step(){if(cam.length==0){clearInterval(tm);tm=null;document.getElementById('gps').innerText=`✅ CHEGOU EM X:${tx} Y:${ty} - CLIQUE NO PROXIMO`;return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
+function mover(dx,dy){if(tm)clearInterval(tm);tm=null;let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;draw();}
+function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;cam=achar(px,py,x,y);document.getElementById('gps').innerText=`🚀 INDO PARA X:${x} Y:${y} - ${cam.length} passos`;if(cam.length==0){draw();return;}tm=setInterval(step,150);draw();}
 draw();
-cam=achar(px,py,tx,ty);tm=setInterval(step,150);
-ativarGPS();
 </script>
 </body>
 </html>

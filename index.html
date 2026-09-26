@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V45 SÓ NO TANG</title>
+<title>V47 FLAG PRA BAIXO</title>
 <style>
 body{background:#000;margin:0;color:#fff;font-family:Arial}
-#gps{background:#052e16;color:#22c55e;padding:6px;text-align:center;font-size:11px}
+#gps{background:#052e16;color:#22c55e;padding:6px;text-align:center;font-size:12px;font-weight:bold}
 canvas{border:3px solid #facc15;background:#000;display:block;margin:0 auto}
 .btns{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px}
-button{height:42px;border-radius:10px;border:2px solid #facc15;font-weight:bold;font-size:11px}
-.bm{width:46px;background:#222;color:#facc15}
-.bprod{width:102px;background:#a855f7;color:#fff}
-.bway{width:102px;background:#22c55e;color:#000}
+button{height:44px;border-radius:10px;border:2px solid #facc15;font-weight:bold;font-size:12px}
+.bm{width:48px;background:#222;color:#facc15}
+.bprod{width:104px;background:#a855f7;color:#fff}
+.bway{width:104px;background:#22c55e;color:#000}
 </style>
 </head>
 <body>
-<div id="gps">V45 - BANDEIRA SÓ NO TANG</div>
-<div id="top" style="text-align:center;color:#facc15;font-size:11px;padding:5px"></div>
-<canvas id="c" width="800" height="380"></canvas>
+<div id="gps">V47 - BANDEIRA PRA BAIXO NO TANG 33</div>
+<div id="top" style="text-align:center;color:#facc15;font-size:12px;padding:6px;font-weight:bold"></div>
+<canvas id="c" width="800" height="400"></canvas>
 <div class="btns">
 <button class="bm" onclick="mover(-1,0)">←</button>
 <button class="bm" onclick="mover(0,-1)">↑</button>
@@ -40,33 +40,28 @@ function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);whil
 function updateCamera(){camX=px*W-cv.width/2+W/2;camY=py*H-cv.height/2+H/2;camX=Math.max(0,Math.min(camX,COLS*W-cv.width));camY=Math.max(0,Math.min(camY,ROWS*H-cv.height));}
 function draw(){
  updateCamera();
- ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);
+ ctx.fillStyle='#000';ctx.fillRect(0,0,800,400);
  ctx.save();ctx.translate(-camX,-camY);
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
   if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}
   else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}
  }
- // baia vermelha
- if(!(tx==POS.WAY.x && ty==POS.WAY.y)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);}
- // BANDEIRA SÓ SE FOR TANG OU PROD E CHEGOU
- if(chegou && px==tx && py==ty &&!(tx==POS.WAY.x && ty==POS.WAY.y)){
+ // Destino vermelho - SÓ TANG/PROD
+ if(!(tx==POS.WAY.x && ty==POS.WAY.y)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.strokeRect(tx*W,ty*H,W,H);}
+
+ // BANDEIRA SEMPRE PRA BAIXO NO TOPO
+ if(px==tx && py==ty &&!(tx==POS.WAY.x && ty==POS.WAY.y)){
    let bx=tx*W,by=ty*H;
-   let fx = bx+12; if(fx<camX+4) fx=camX+4; if(fx+115>camX+800-4) fx=camX+800-119;
-   ctx.fillStyle='#facc15';ctx.fillRect(bx+8,by-78,4,78);
-   ctx.fillStyle='#fff';ctx.fillRect(fx,by-78,115,54);ctx.strokeStyle='#facc15';ctx.lineWidth=2;ctx.strokeRect(fx,by-78,115,54);
-   ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText('📍 CHEGOU!',fx+6,by-62);
-   ctx.font='bold 9px Arial';ctx.fillText(tx==33?'TANG 364 - X33':'PROD 340',fx+6,by-50);
-   try{if(tangImg.complete && tangImg.naturalWidth>0 && tx==33){ctx.drawImage(tangImg,fx+70,by-74,38,38);}else{ctx.fillStyle='#f97316';ctx.fillRect(fx+70,by-74,38,32);ctx.fillStyle='#fff';ctx.font='bold 7px Arial';ctx.fillText('TANG',fx+76,by-56);}}catch(e){}
- }
- ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
- ctx.restore();
- document.getElementById('top').innerText=`V45 | X:${px} Y:${py} → DEST X:${tx} Y:${ty} ${chegou &&!(tx==POS.WAY.x && ty==POS.WAY.y)?'✅ CHEGOU NO TANG!':''}`;
-}
-function step(){if(cam.length==0){clearInterval(tm);tm=null;chegou=true;draw();return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;chegou=false;draw();}
-function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;chegou=false;cam=achar(px,py,x,y);if(cam.length==0 &&!(x==px && y==py)){chegou=false;draw();return;}if(x==px && y==py){chegou=true;draw();return;}tm=setInterval(step,150);draw();}
-tangImg.onload=()=>draw();
-draw();
-</script>
-</body>
-</html>
+   let flagY = by+22; // SEMPRE PRA BAIXO
+   let fx = bx-50; // centraliza
+   if(fx<camX+2) fx=camX+2;
+   if(fx+125>camX+800-2) fx=camX+800-127;
+
+   // mastro pra baixo
+   ctx.fillStyle='#facc15';ctx.fillRect(bx+8,by+20,4,60);
+   // caixa branca
+   ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,125,58);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,125,58);
+   ctx.fillStyle='#000';ctx.font='bold 12px Arial';ctx.fillText('📍 CHEGOU!',fx+8,flagY+18);
+   ctx.font='bold 10px Arial';ctx.fillText('TANG 364 - X33',fx+8,flagY+32);
+   ctx.font='bold 8px Arial';ctx.fillText('BAIA 33',fx+8,flagY+45);
+   //

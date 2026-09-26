@@ -1,41 +1,65 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atacadão 364 - V3.1 FIX</title>
+<title>364 FIX</title>
 <style>
-body{background:#0f172a;color:white;font-family:Arial;text-align:center;margin:0;padding:10px}
-#gameBox{width:95%;max-width:400px;height:460px;margin:10px auto;border:4px solid #facc15;border-radius:15px;background:#1e3a8a;position:relative;overflow:hidden}
-.corredor{position:absolute;width:5%;height:90%;background:#1e40af;top:5%;border-radius:3px;text-align:center}
-#player{position:absolute;font-size:32px;transition:all 0.3s;z-index:10;left:2%;top:20px}
-#camera{position:absolute;width:44px;height:44px;background:white;border-radius:8px;opacity:0.8;left:1%;top:16px}
-#slider{width:90%;accent-color:#facc15;direction:rtl}
-.btn{width:90%;padding:15px;border:none;border-radius:10px;font-weight:bold;margin:5px;font-size:16px}
-.btn-gps{background:#22c55e;color:white}
-.btn-entrada{background:#facc15;color:black}
-#caixaMissao{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88%;background:#0f172a;border:3px solid #facc15;border-radius:15px;padding:15px;z-index:20;text-align:left}
-.tag{background:#1e3a8a;padding:4px 8px;border-radius:6px;margin:2px;display:inline-block;font-size:12px}
-#confetti{position:fixed;top:20%;left:5%;width:90%;background:#22c55e;color:white;padding:20px;border-radius:15px;display:none;z-index:30;font-size:20px;font-weight:bold}
+body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding:10px}
+#box{width:95%;max-width:380px;height:400px;margin:10px auto;border:4px solid yellow;border-radius:15px;background:#1e3a8a;position:relative;overflow:hidden}
+#player{position:absolute;font-size:30px;left:10px;top:10px;transition:0.3s}
+#missao{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;background:#0f172a;border:3px solid yellow;border-radius:12px;padding:12px;z-index:20}
+button{width:90%;padding:14px;margin:5px;border:none;border-radius:10px;font-weight:bold;font-size:16px}
 </style>
 </head>
 <body>
-<h2>🛒 ATACADÃO 364 - V3.1 FIX</h2>
-<div id="gameBox">
-  <div id="corredores"></div>
-  <div id="camera"></div>
-  <div id="player">🛒</div>
-  <div id="caixaMissao">
-    <h3 style="margin:0;color:#facc15">📦 CAIXA DE PEDIDO</h3>
-    <p style="margin:5px 0"><b>MISSÃO: ENCONTRE O TANG 364</b><br>Recompensa: 200 XP + 50 Moedas</p>
-    <p style="margin:5px 0"><b>OBJETIVO:</b><br><span class="tag">1. Vá até 364 📍</span><br><span class="tag">2. Encontre 1 - WHEY 💪</span></p>
-    <p id="gpsInfo" style="background:#1e40af;padding:6px;border-radius:6px;font-size:13px">📡 [ GPS: 120m → Nordeste ]</p>
-    <button onclick="aceitarMissao()" style="width:100%;padding:12px;background:#22c55e;color:white;border:none;border-radius:8px;font-weight:bold">✅ ACEITAR MISSÃO</button>
-  </div>
+<h3>🛒 364 - V3.2</h3>
+<div id="box">
+<div id="player">🛒</div>
+<div id="missao">
+<b>📦 MISSÃO: TANG 364 → WHEY 1</b><br><br>
+<button onclick="aceitar()" style="background:#22c55e;color:white">✅ ACEITAR MISSÃO</button>
 </div>
-<label>364 TANG ◄► WHEY 1</label><br>
-<input type="range" id="slider" min="1" max="364" value="364">
-<h3 id="pos">POSIÇÃO: 364 - TANG (C125)</h3>
-<p id="gpsStatus">📡 GPS desligado</p>
-<button class="btn btn-gps" onclick="ligarGPS()">📍 LIGAR MEU GPS REAL</button>
-<button class="btn btn-entrada">🏁 ENTR
+</div>
+<br>
+<input type="range" id="slider" min="1" max="364" value="1" style="width:90%">
+<h3 id="pos">POS: 364</h3>
+<button onclick="gps()" style="background:#22c55e;color:white">📍 LIGAR GPS</button>
+<p id="status">GPS desligado</p>
+<script>
+var pos=364;
+var player=document.getElementById('player');
+var slider=document.getElementById('slider');
+var posTxt=document.getElementById('pos');
+var statusTxt=document.getElementById('status');
+function atualizar(v){
+pos=v;
+posTxt.innerText='POS: '+pos;
+player.style.left=(v/4)+'%';
+player.style.top=(v%100)+'px';
+if(pos<=1){alert('CHEGOU NO WHEY!');}
+}
+slider.oninput=function(){
+var invertido=365-parseInt(this.value);
+atualizar(invertido);
+}
+function aceitar(){
+document.getElementById('missao').style.display='none';
+alert('Missão aceita! Use o slider agora');
+}
+function gps(){
+statusTxt.innerText='GPS tentando ligar...';
+if(navigator.geolocation){
+navigator.geolocation.getCurrentPosition(function(p){
+statusTxt.innerText='GPS OK '+p.coords.accuracy+'m';
+},function(e){
+statusTxt.innerText='GPS bloqueado - use slider';
+});
+}else{
+statusTxt.innerText='Sem GPS nesse A1';
+}
+}
+atualizar(364);
+</script>
+</body>
+</html>

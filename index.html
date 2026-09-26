@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atacadão 364 - V3 Missão</title>
+<title>Atacadão 364 - V3.1 FIX</title>
 <style>
 body{background:#0f172a;color:white;font-family:Arial;text-align:center;margin:0;padding:10px}
 #gameBox{width:95%;max-width:400px;height:460px;margin:10px auto;border:4px solid #facc15;border-radius:15px;background:#1e3a8a;position:relative;overflow:hidden}
-.corredor{position:absolute;width:5%;height:90%;background:#1e40af;top:5%;border-radius:3px}
-#player{position:absolute;font-size:32px;transition:all 0.3s;z-index:10}
-#camera{position:absolute;width:44px;height:44px;background:white;border-radius:8px;opacity:0.9}
-#slider{width:90%;accent-color:#facc15}
+.corredor{position:absolute;width:5%;height:90%;background:#1e40af;top:5%;border-radius:3px;text-align:center}
+#player{position:absolute;font-size:32px;transition:all 0.3s;z-index:10;left:2%;top:20px}
+#camera{position:absolute;width:44px;height:44px;background:white;border-radius:8px;opacity:0.8;left:1%;top:16px}
+#slider{width:90%;accent-color:#facc15;direction:rtl}
 .btn{width:90%;padding:15px;border:none;border-radius:10px;font-weight:bold;margin:5px;font-size:16px}
 .btn-gps{background:#22c55e;color:white}
 .btn-entrada{background:#facc15;color:black}
@@ -20,7 +20,7 @@ body{background:#0f172a;color:white;font-family:Arial;text-align:center;margin:0
 </style>
 </head>
 <body>
-<h2>🛒 ATACADÃO 364 - V3 MISSÃO</h2>
+<h2>🛒 ATACADÃO 364 - V3.1 FIX</h2>
 <div id="gameBox">
   <div id="corredores"></div>
   <div id="camera"></div>
@@ -28,32 +28,14 @@ body{background:#0f172a;color:white;font-family:Arial;text-align:center;margin:0
   <div id="caixaMissao">
     <h3 style="margin:0;color:#facc15">📦 CAIXA DE PEDIDO</h3>
     <p style="margin:5px 0"><b>MISSÃO: ENCONTRE O TANG 364</b><br>Recompensa: 200 XP + 50 Moedas</p>
-    <p style="margin:5px 0"><b>OBJETIVO:</b><br>
-    <span class="tag">1. Vá até posição 364 📍</span><br>
-    <span class="tag">2. Encontre posição 1 - WHEY 💪</span></p>
-    <p id="gpsInfo" style="background:#1e40af;padding:6px;border-radius:6px;font-size:13px">📡 [ GPS: 120m → Direção Nordeste ]</p>
+    <p style="margin:5px 0"><b>OBJETIVO:</b><br><span class="tag">1. Vá até 364 📍</span><br><span class="tag">2. Encontre 1 - WHEY 💪</span></p>
+    <p id="gpsInfo" style="background:#1e40af;padding:6px;border-radius:6px;font-size:13px">📡 [ GPS: 120m → Nordeste ]</p>
     <button onclick="aceitarMissao()" style="width:100%;padding:12px;background:#22c55e;color:white;border:none;border-radius:8px;font-weight:bold">✅ ACEITAR MISSÃO</button>
   </div>
 </div>
+<label>364 TANG ◄► WHEY 1</label><br>
 <input type="range" id="slider" min="1" max="364" value="364">
-<h3 id="pos">POSIÇÃO: 364 - TANG</h3>
+<h3 id="pos">POSIÇÃO: 364 - TANG (C125)</h3>
 <p id="gpsStatus">📡 GPS desligado</p>
 <button class="btn btn-gps" onclick="ligarGPS()">📍 LIGAR MEU GPS REAL</button>
-<button class="btn btn-entrada">🏁 ENTRADA Apos 364</button>
-<div id="confetti">🎉 MISSÃO COMPLETA!<br>ENTRADA Apos 364 LIBERADA!<br>+200 XP</div>
-<script>
-let pos=364, lastVoz=0, missaoAtiva=false;
-const corredoresMap=[125,123,121,120,113,112,111,119,108,107,106,105,104,103,102,101,100];
-const nomes={125:"TANG",100:"WHEY - CHEGADA"};
-const player=document.getElementById('player'), camera=document.getElementById('camera'), posText=document.getElementById('pos'), slider=document.getElementById('slider'), gpsStatus=document.getElementById('gpsStatus');
-function criarCorredores(){const div=document.getElementById('corredores');corredoresMap.forEach((c,i)=>{let el=document.createElement('div');el.className='corredor';el.style.left=(2+i*5.6)+'%';el.innerHTML=`<small style="font-size:8px">${c}</small>`;div.appendChild(el);});}
-criarCorredores();
-function fala(t){if('speechSynthesis' in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';speechSynthesis.speak(u);}}
-function atualizar(t){pos=t;slider.value=pos;let idx=Math.floor((364-pos)/21.4);if(idx<0)idx=0;if(idx>=corredoresMap.length)idx=corredoresMap.length-1;let corAtual=corredoresMap[idx];posText.innerText=`POSIÇÃO: ${pos} - C${corAtual}`;let x=2+idx*5.6;let y=20+(pos%21)*18;if(y>380)y=380;player.style.left=x+'%';player.style.top=y+'px';camera.style.left=(x-1)+'%';camera.style.top=(y-4)+'px';if(missaoAtiva && pos<=1){document.getElementById('confetti').style.display='block';fala('Missão completa!');missaoAtiva=false;}}
-slider.addEventListener('input', e=>atualizar(parseInt(e.target.value)));
-function aceitarMissao(){document.getElementById('caixaMissao').style.display='none';missaoAtiva=true;fala('Missão aceita! Saindo do Tang 364 em direção ao Whey');}
-function ligarGPS(){gpsStatus.innerHTML='✅ GPS ATIVO';fala('GPS ligado. Aceite a missão');}
-atualizar(364);
-</script>
-</body>
-</html>
+<button class="btn btn-entrada">🏁 ENTR

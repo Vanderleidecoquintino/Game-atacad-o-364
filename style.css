@@ -1,0 +1,21 @@
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#fff;font-family:Arial;overflow:hidden;touch-action:none}
+#top{padding:8px 10px;background:#000;display:flex;justify-content:space-between;font-size:10px}
+#escala{background:#facc15;color:#000;text-align:center;padding:5px;font-weight:bold;font-size:9px}
+#mapWrap{width:100%;height:60vh;overflow:auto;background:#e5e7eb;position:relative;border:3px solid #000;-webkit-overflow-scrolling:touch}
+#mapa{position:relative;background:#fff;width:3400px;height:1300px}
+.baia{position:absolute;border:2.5px solid #000}
+.prat{position:absolute;width:100%;border-bottom:1px solid #222;font-size:7px;display:flex;align-items:center;padding-left:3px;color:#000;font-weight:bold;background:rgba(255,255,255,0.7)}
+.corredorH{position:absolute;background:repeating-linear-gradient(90deg,#fff 0 30px,#facc15 30px 60px);border:2.5px dashed #b45309;z-index:2;display:flex;align-items:center;justify-content:center;color:#000;font-weight:bold;font-size:11px}
+.corredorV{position:absolute;background:repeating-linear-gradient(180deg,#fff 0 30px,#fb923c 30px 60px);border:2.5px dashed #9a3412;z-index:2}
+#player{position:absolute;z-index:25;font-size:32px;transition:all 0.12s linear;pointer-events:none;filter:drop-shadow(2px 2px 2px #000)}
+#caixas{position:absolute;left:0;top:1100px;width:3400px;height:110px;background:#fde68a;border:3px solid #000;display:flex;align-items:center;justify-content:center;color:#000;font-weight:bold;font-size:16px;z-index:4}
+.origemDot{position:absolute;left:0;top:1100px;width:18px;height:18px;background:red;border:3px solid #fff;border-radius:50%;z-index:30;transform:translate(-50%,-50%)}
+.origemLabel{position:absolute;left:15px;top:1180px;color:red;font-weight:bold;font-size:11px;z-index:30;background:#fff;padding:2px 6px;border-radius:4px;border:2px solid red}
+#controls{padding:8px;background:#1e293b;position:fixed;bottom:0;width:100%;height:30vh;display:flex;flex-direction:column;justify-content:center}
+.joy{display:grid;grid-template-columns:64px 64px 64px;gap:6px;justify-content:center;margin-top:6px}
+.joy button{padding:14px;background:#334155;color:#fff;border:2px solid #475569;border-radius:12px;font-size:20px;font-weight:bold}
+.joy button:active{background:#facc15;color:#000;transform:scale(0.92)}
+#pos{color:#facc15;font-weight:bold;text-align:center;font-size:10px;line-height:1.3}
+#legend{display:flex;gap:5px;justify-content:center;margin-top:6px;font-size:8px;flex-wrap:wrap}
+#legend span{padding:3px 6px;border-radius:4px;color:#000;font-weight:bold;border:1px solid #000}

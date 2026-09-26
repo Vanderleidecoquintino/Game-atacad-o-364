@@ -3,61 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V40 BANDEIRA</title>
+<title>V43 TANG FOTO REAL</title>
 <style>
 body{background:#000;margin:0;color:#fff;font-family:Arial}
-#gps{background:#052e16;color:#22c55e;padding:8px;text-align:center;font-size:11px}
-#wrap{position:relative;width:800px;margin:5px auto}
-canvas{border:3px solid #facc15;background:#000;display:block}
-#flag{position:absolute;display:none;top:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;border:3px solid #facc15;border-radius:12px;padding:8px;text-align:center;z-index:10;animation:bounce.5s}
-#flag img{width:90px;height:90px;object-fit:contain}
-@keyframes bounce{0%{transform:translateX(-50%) translateY(30px) scale(.5)}100%{transform:translateX(-50%) translateY(0) scale(1)}}
-.btns{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:8px}
-button{height:36px;border-radius:8px;border:2px solid #facc15;font-weight:bold;font-size:10px}
-.bm{width:42px;background:#222;color:#facc15}
-.bprod{width:90px;background:#a855f7;color:#fff}
-.bway{width:95px;background:#22c55e;color:#000}
+#gps{background:#052e16;color:#22c55e;padding:6px;text-align:center;font-size:11px}
+canvas{border:3px solid #facc15;background:#000;display:block;margin:0 auto}
+.btns{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px}
+button{height:40px;border-radius:10px;border:2px solid #facc15;font-weight:bold;font-size:11px}
+.bm{width:44px;background:#222;color:#facc15}
+.bprod{width:100px;background:#a855f7;color:#fff}
+.bway{width:100px;background:#22c55e;color:#000}
 </style>
 </head>
 <body>
-<div id="gps">V40 - BANDEIRA TANG</div>
-<div id="top" style="text-align:center;color:#facc15;font-size:10px;padding:4px"></div>
-<div id="wrap">
+<div id="gps">V43 - TANG 33 COM SUA FOTO</div>
+<div id="top" style="text-align:center;color:#facc15;font-size:11px;padding:5px"></div>
 <canvas id="c" width="800" height="380"></canvas>
-<div id="flag">
-<div style="font-weight:bold;font-size:14px">📍 TANG AQUI!</div>
-<img src="tang.png" onerror="this.style.display='none'">
-<div style="font-size:11px">TANG 364 - LARANJA</div>
-<div style="font-size:9px;color:#f97316">25g | FAZ 1 LITRO</div>
-</div>
-</div>
 <div class="btns">
 <button class="bm" onclick="mover(-1,0)">←</button>
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<button class="bprod" onclick="ir(POS.TANG.x, POS.TANG.y)">TANG 364</button>
-<button class="bprod" onclick="ir(POS.PROD.x, POS.PROD.y)">PROD 340</button>
-<button class="bway" onclick="ir(POS.WAY.x, POS.WAY.y)">📦 WAY</button>
+<button class="bprod" onclick="ir(POS.TANG.x,POS.TANG.y)">TANG 364</button>
+<button class="bprod" onclick="ir(POS.PROD.x,POS.PROD.y)">PROD 340</button>
+<button class="bway" onclick="ir(POS.WAY.x,POS.WAY.y)">📦 WAY</button>
 </div>
 <script>
-const POS={
-  TANG:{x:34,y:1},
-  PROD:{x:35,y:1},
-  WAY:{x:0,y:16}
-};
+const POS={TANG:{x:33,y:1},PROD:{x:35,y:1},WAY:{x:0,y:16}};
 const COLS=40,ROWS=19,W=20,H=20;
-const cv=document.getElementById('c'),ctx=cv.getContext('2d'),flag=document.getElementById('flag');
-let px=POS.WAY.x,py=POS.WAY.y,tx=POS.WAY.x,ty=POS.WAY.y,cam=[],tm=null,lab=[],dot=[],camX=0,camY=0;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let px=POS.WAY.x,py=POS.WAY.y,tx=POS.WAY.x,ty=POS.WAY.y,cam=[],tm=null,lab=[],dot=[],camX=0,camY=0,chegou=false;
+const tangImg=new Image();
+tangImg.src='IMG-20260926-WA7510.jpg'; // SUA FOTO
 for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){lab[y][x]=(y==0||y==8||y==17||x==0||x==39)?0:(x%5<3)?1:0;dot[y][x]=lab[y][x]==0;}}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
 function updateCamera(){camX=px*W-cv.width/2+W/2;camY=py*H-cv.height/2+H/2;camX=Math.max(0,Math.min(camX,COLS*W-cv.width));camY=Math.max(0,Math.min(camY,ROWS*H-cv.height));}
-function checkFlag(){if(px==tx&&py==ty&&tx==POS.TANG.x&&ty==POS.TANG.y){flag.style.display='block';}else if(px==tx&&py==ty){flag.innerHTML='<div style=\"font-weight:bold\">📍 CHEGOU!</div><div style=\"font-size:11px\">PROD '+tx+','+ty+'</div>';flag.style.display='block';}else{flag.style.display='none';}}
-function draw(){updateCamera();ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);ctx.save();ctx.translate(-camX,-camY);for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}}ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);if(px==tx&&py==ty){ctx.fillStyle='#facc15';ctx.fillRect(tx*W-2,ty*H-50,4,50);ctx.fillStyle='#fff';ctx.fillRect(tx*W+2,ty*H-50,40,22);ctx.fillStyle='#000';ctx.font='bold 10px Arial';ctx.fillText('TANG',tx*W+6,ty*H-36);}ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.restore();document.getElementById('top').innerText=`X:${px} Y:${py} → DESTINO X:${tx} Y:${ty}`;checkFlag();}
-function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;flag.style.display='none';cam=achar(px,py,x,y);if(cam.length==0){draw();return;}tm=setInterval(step,150);draw();}
+function draw(){
+ updateCamera();
+ ctx.fillStyle='#000';ctx.fillRect(0,0,800,380);
+ ctx.save();ctx.translate(-camX,-camY);
+ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+  if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}
+  else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}
+ }
+ ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);
+ if(chegou && px==tx && py==ty){
+   let bx=tx*W,by=ty*H;
+   ctx.fillStyle='#facc15';ctx.fillRect(bx+8,by-75,4,75);
+   ctx.fillStyle='#fff';ctx.fillRect(bx+12,by-75,110,52);ctx.strokeStyle='#facc15';ctx.lineWidth=2;ctx.strokeRect(bx+12,by-75,110,52);
+   ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText('📍 CHEGOU!',bx+16,by-60);
+   ctx.font='bold 9px Arial';ctx.fillText(tx==33?'TANG 364 - X33':'BAIA '+tx,bx+16,by-48);
+   try{if(tangImg.complete && tangImg.naturalWidth>0 && tx==33){ctx.drawImage(tangImg,bx+70,by-70,36,36);}else{ctx.fillStyle='#f97316';ctx.fillRect(bx+70,by-70,36,30);ctx.fillStyle='#fff';ctx.font='bold 7px Arial';ctx.fillText('TANG',bx+74,by-52);}}catch(e){}
+ }
+ ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,9,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+ ctx.restore();
+ document.getElementById('top').innerText=`X:${px} Y:${py} → DESTINO X:${tx} Y:${ty} ${chegou?'✅ CHEGOU!':''}`;
+}
+function step(){if(cam.length==0){clearInterval(tm);tm=null;chegou=true;draw();return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
+function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;chegou=false;draw();}
+function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;chegou=false;cam=achar(px,py,x,y);if(cam.length==0){chegou=true;draw();return;}tm=setInterval(step,150);draw();}
+tangImg.onload=()=>draw();
 draw();
 </script>
 </body>

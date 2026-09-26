@@ -2,93 +2,89 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V49 CAM + RASTRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>V50 CEL</title>
 <style>
-body{background:#000;margin:0;color:#fff;font-family:Arial}
-#gps{background:#22c55e;color:#000;padding:8px;text-align:center;font-size:14px;font-weight:bold}
-canvas{border:3px solid #facc15;background:#000;display:block;margin:0 auto}
-.btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px}
-button{height:48px;border-radius:12px;border:3px solid #facc15;font-weight:bold;font-size:13px}
-.bm{width:50px;background:#222;color:#facc15}
-.bprod{width:110px;background:#a855f7;color:#fff}
-.bway{width:110px;background:#22c55e;color:#000}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;color:#fff;font-family:Arial;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+#gps{background:#22c55e;color:#000;padding:6px;text-align:center;font-size:12px;font-weight:bold}
+#top{background:#111;color:#facc15;font-size:11px;padding:4px;text-align:center;font-weight:bold}
+#canvasWrap{flex:1;display:flex;align-items:center;justify-content:center;background:#000;padding:4px}
+canvas{border:2px solid #facc15;background:#000;max-width:100%;max-height:100%;width:100%;height:auto;touch-action:none}
+.btns{display:grid;grid-template-columns:repeat(4,1fr) 1.3fr 1.3fr;gap:5px;padding:6px;background:#0a0a0a}
+button{height:48px;border-radius:10px;border:2px solid #facc15;font-weight:bold;font-size:11px}
+.bm{background:#222;color:#facc15;font-size:18px}
+.bprod{background:#a855f7;color:#fff}
+.bway{background:#22c55e;color:#000}
+@media(max-width:400px){button{height:44px;font-size:10px}.bprod,.bway{font-size:9px}}
 </style>
 </head>
 <body>
-<div id="gps">V49 - CÂMERA SEGUE + RASTRO VERDE</div>
-<div id="top" style="text-align:center;color:#facc15;font-size:13px;padding:8px;font-weight:bold;background:#111"></div>
-<canvas id="c" width="800" height="400"></canvas>
+<div id="gps">V50 - CELULAR</div>
+<div id="top">CARREGANDO...</div>
+<div id="canvasWrap"><canvas id="c" width="400" height="260"></canvas></div>
 <div class="btns">
 <button class="bm" onclick="mover(-1,0)">←</button>
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<button class="bprod" onclick="ir(34,1)">TANG 364</button>
-<button class="bprod" onclick="ir(35,1)">PROD 340</button>
-<button class="bway" onclick="ir(0,16)">📦 WAY</button>
+<button class="bprod" onclick="ir(33,1)">TANG</button>
+<button class="bway" onclick="ir(0,16)">WAY</button>
 </div>
 <script>
-const COLS=60,ROWS=19,W=20,H=20; // AUMENTEI PRA 60 PRA CAMERA TER O QUE SEGUIR
+const COLS=40,ROWS=19,W=20,H=20;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-let px=0,py=16,tx=0,ty=16,cam=[],tm=null,lab=[],dot=[],camX=0,camY=0;
-let rastro=[]; // RASTRO VERDE
+let px=0,py=16,tx=0,ty=16,cam=[],tm=null,lab=[],dot=[],camX=0,camY=0,rastro=[];
 const tangImg=new Image();tangImg.src='IMG-20260926-WA7510.jpg';
-for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){lab[y][x]=(y==0||y==8||y==17||x==0||x==59)?0:(x%5<3)?1:0;dot[y][x]=lab[y][x]==0;}}
+for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){lab[y][x]=(y==0||y==8||y==17||x==0||x==39)?0:(x%5<3)?1:0;dot[y][x]=lab[y][x]==0;}}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
+function resizeCanvas(){
+  let wrap=document.getElementById('canvasWrap');
+  let w=wrap.clientWidth-8, h=wrap.clientHeight-8;
+  let scale=Math.min(w/400, h/260);
+  cv.style.width=(400*scale)+'px'; cv.style.height=(260*scale)+'px';
+}
+window.addEventListener('resize',resizeCanvas);
 function updateCamera(){
-  // CÂMERA SEGUE SUAVE
-  let targetX = px*W - cv.width/2 + W/2;
-  let targetY = py*H - cv.height/2 + H/2;
-  camX += (targetX - camX)*0.15; // SUAVIZAÇÃO
-  camY += (targetY - camY)*0.15;
-  camX=Math.max(0,Math.min(camX,COLS*W-cv.width));
-  camY=Math.max(0,Math.min(camY,ROWS*H-cv.height));
+  let vw=400, vh=260;
+  let targetX=px*W - vw/2 + W/2;
+  let targetY=py*H - vh/2 + H/2;
+  camX+=(targetX-camX)*0.18; camY+=(targetY-camY)*0.18;
+  camX=Math.max(0,Math.min(camX,COLS*W-vw)); camY=Math.max(0,Math.min(camY,ROWS*H-vh));
 }
 function draw(){
  updateCamera();
- ctx.fillStyle='#000';ctx.fillRect(0,0,800,400);
+ ctx.fillStyle='#000';ctx.fillRect(0,0,400,260);
  ctx.save();ctx.translate(-camX,-camY);
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
   if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}
-  else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}
+  else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,2,0,6.28);ctx.fill();}
  }
- // RASTRO VERDE ATRÁS
- for(let i=0;i<rastro.length;i++){
-   let p=rastro[i];
-   let alpha = (i+1)/rastro.length;
-   ctx.fillStyle=`rgba(34,197,94,${0.3+alpha*0.7})`;
-   ctx.beginPath();ctx.arc(p.x*W+10,p.y*H+10,6*alpha+2,0,6.28);ctx.fill();
+ for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle=`rgba(34,197,94,${0.3+a*0.7})`;ctx.beginPath();ctx.arc(p.x*W+10,p.y*H+10,4*a+1.5,0,6.28);ctx.fill();}
+ if(!(tx==0&&ty==16)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-1,ty*H-1,W+2,H+2);}
+ if(px==tx&&py==ty&&!(tx==0&&ty==16)){
+   let bx=tx*W,by=ty*H,flagY=by+22,fx=bx-30;
+   if(fx<camX) fx=camX+2; if(fx+110>camX+400) fx=camX+400-112;
+   ctx.fillStyle='#facc15';ctx.fillRect(bx+7,by+18,3,50);
+   ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,110,48);ctx.strokeStyle='#facc15';ctx.lineWidth=2;ctx.strokeRect(fx,flagY,110,48);
+   ctx.fillStyle='#000';ctx.font='bold 10px Arial';ctx.fillText('📍 CHEGOU!',fx+5,flagY+14);
+   ctx.font='bold 8px Arial';ctx.fillText('TANG X33',fx+5,flagY+26);
+   try{if(tangImg.complete&&tangImg.naturalWidth>0){ctx.drawImage(tangImg,fx+68,flagY+4,36,36);}}catch(e){}
  }
- if(!(tx==0&&ty==16)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}
- if(px==tx && py==ty &&!(tx==0&&ty==16)){
-   let bx=tx*W,by=ty*H;
-   let flagY = by+25; let fx = bx-40;
-   if(fx<camX) fx=camX+2; if(fx+150>camX+800) fx=camX+800-152;
-   ctx.fillStyle='#facc15';ctx.fillRect(bx+8,by+20,5,70);
-   ctx.fillStyle='#ffffff';ctx.fillRect(fx,flagY,145,70);ctx.strokeStyle='#facc15';ctx.lineWidth=4;ctx.strokeRect(fx,flagY,145,70);
-   ctx.fillStyle='#000';ctx.font='bold 14px Arial';ctx.fillText('📍 CHEGOU!',fx+8,flagY+20);
-   ctx.font='bold 11px Arial';ctx.fillText('TANG 364 - X33',fx+8,flagY+36);
-   try{if(tangImg.complete && tangImg.naturalWidth>0){ctx.drawImage(tangImg,fx+90,flagY+6,48,48);ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.strokeRect(fx+90,flagY+6,48,48);}}catch(e){}
- }
- ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,10,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+ ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,7,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
  ctx.restore();
- document.getElementById('top').innerText=`V49 | X:${px} Y:${py} → X:${tx} | RASTRO: ${rastro.length} | ${px==tx&&py==ty&&!(tx==0&&ty==16)?'✅ CHEGOU!':''}`;
+ document.getElementById('top').innerText=`V50 CEL | X:${px} Y:${py} → ${tx},${ty} | ${rastro.length} passos`;
 }
-function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>40) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>40) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){
-  if(tm){clearInterval(tm);tm=null;}
-  if(x==0&&y==16){rastro=[];} // LIMPA RASTRO NO WAY
-  tx=x;ty=y;cam=achar(px,py,x,y);
-  if(px==x&&py==y){draw();return;}
-  if(cam.length==0){rastro.push({x:px,y:py});px=x;py=y;draw();return;}
-  tm=setInterval(step,120);draw();
-}
-function loop(){updateCamera();draw();requestAnimationFrame(loop);} // LOOP PRA CAMERA SEGUIR SEMPRE
+function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>30) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
+function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>30) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
+function ir(x,y){if(tm){clearInterval(tm);tm=null;}if(x==0&&y==16) rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(px==x&&py==y){draw();return;}if(cam.length==0){rastro.push({x:px,y:py});px=x;py=y;draw();return;}tm=setInterval(step,110);draw();}
+function loop(){updateCamera();draw();requestAnimationFrame(loop);}
 tangImg.onload=()=>draw();
-draw();loop();
+resizeCanvas();draw();loop();
+// swipe no canvas
+let sx=0,sy=0;cv.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;});
+cv.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)){mover(dx>0?1:-1,0)}else{mover(0,dy>0?1:-1)}});
 </script>
 </body>
 </html>

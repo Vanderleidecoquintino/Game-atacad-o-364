@@ -3,36 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V47 FLAG PRA BAIXO</title>
+<title>V48 AGORA VAI</title>
 <style>
 body{background:#000;margin:0;color:#fff;font-family:Arial}
-#gps{background:#052e16;color:#22c55e;padding:6px;text-align:center;font-size:12px;font-weight:bold}
+#gps{background:#22c55e;color:#000;padding:8px;text-align:center;font-size:14px;font-weight:bold}
 canvas{border:3px solid #facc15;background:#000;display:block;margin:0 auto}
-.btns{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px}
-button{height:44px;border-radius:10px;border:2px solid #facc15;font-weight:bold;font-size:12px}
-.bm{width:48px;background:#222;color:#facc15}
-.bprod{width:104px;background:#a855f7;color:#fff}
-.bway{width:104px;background:#22c55e;color:#000}
+.btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px}
+button{height:48px;border-radius:12px;border:3px solid #facc15;font-weight:bold;font-size:13px}
+.bm{width:50px;background:#222;color:#facc15}
+.bprod{width:110px;background:#a855f7;color:#fff}
+.bway{width:110px;background:#22c55e;color:#000}
 </style>
 </head>
 <body>
-<div id="gps">V47 - BANDEIRA PRA BAIXO NO TANG 33</div>
-<div id="top" style="text-align:center;color:#facc15;font-size:12px;padding:6px;font-weight:bold"></div>
+<div id="gps">V48 - CLICOU SOBE!</div>
+<div id="top" style="text-align:center;color:#facc15;font-size:13px;padding:8px;font-weight:bold;background:#111"></div>
 <canvas id="c" width="800" height="400"></canvas>
 <div class="btns">
 <button class="bm" onclick="mover(-1,0)">←</button>
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<button class="bprod" onclick="ir(POS.TANG.x,POS.TANG.y)">TANG 364</button>
-<button class="bprod" onclick="ir(POS.PROD.x,POS.PROD.y)">PROD 340</button>
-<button class="bway" onclick="ir(POS.WAY.x,POS.WAY.y)">📦 WAY</button>
+<button class="bprod" onclick="ir(33,1)">TANG 364</button>
+<button class="bprod" onclick="ir(35,1)">PROD 340</button>
+<button class="bway" onclick="ir(0,16)">📦 WAY</button>
 </div>
 <script>
-const POS={TANG:{x:33,y:1},PROD:{x:35,y:1},WAY:{x:0,y:16}};
 const COLS=40,ROWS=19,W=20,H=20;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-let px=POS.WAY.x,py=POS.WAY.y,tx=POS.WAY.x,ty=POS.WAY.y,cam=[],tm=null,lab=[],dot=[],camX=0,camY=0,chegou=false;
+let px=0,py=16,tx=0,ty=16,cam=[],tm=null,lab=[],dot=[],camX=0,camY=0;
 const tangImg=new Image();tangImg.src='IMG-20260926-WA7510.jpg';
 for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){lab[y][x]=(y==0||y==8||y==17||x==0||x==39)?0:(x%5<3)?1:0;dot[y][x]=lab[y][x]==0;}}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
@@ -46,22 +45,53 @@ function draw(){
   if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}
   else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+10,y*H+10,3,0,6.28);ctx.fill();}
  }
- // Destino vermelho - SÓ TANG/PROD
- if(!(tx==POS.WAY.x && ty==POS.WAY.y)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W,ty*H,W,H);ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.strokeRect(tx*W,ty*H,W,H);}
+ // MARCA VERMELHA NO DESTINO
+ if(!(tx==0&&ty==16)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);ctx.fillStyle='#fff';ctx.font='bold 10px Arial';ctx.fillText('X'+tx,tx*W,ty*H-4);}
 
- // BANDEIRA SEMPRE PRA BAIXO NO TOPO
- if(px==tx && py==ty &&!(tx==POS.WAY.x && ty==POS.WAY.y)){
+ // BANDEIRA - SEMPRE QUE ESTIVER NO DESTINO (SEM CHEGOU)
+ if(px==tx && py==ty &&!(tx==0&&ty==16)){
    let bx=tx*W,by=ty*H;
-   let flagY = by+22; // SEMPRE PRA BAIXO
-   let fx = bx-50; // centraliza
-   if(fx<camX+2) fx=camX+2;
-   if(fx+125>camX+800-2) fx=camX+800-127;
+   // PRA BAIXO
+   let flagY = by+25;
+   let fx = bx-40;
+   if(fx<camX) fx=camX+2;
+   if(fx+150>camX+800) fx=camX+800-152;
 
-   // mastro pra baixo
-   ctx.fillStyle='#facc15';ctx.fillRect(bx+8,by+20,4,60);
-   // caixa branca
-   ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,125,58);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,125,58);
-   ctx.fillStyle='#000';ctx.font='bold 12px Arial';ctx.fillText('📍 CHEGOU!',fx+8,flagY+18);
-   ctx.font='bold 10px Arial';ctx.fillText('TANG 364 - X33',fx+8,flagY+32);
-   ctx.font='bold 8px Arial';ctx.fillText('BAIA 33',fx+8,flagY+45);
-   //
+   // MASTRO AMARELO GROSSO
+   ctx.fillStyle='#facc15';ctx.fillRect(bx+8,by+20,5,70);
+
+   // FUNDO BRANCO GRANDE
+   ctx.fillStyle='#ffffff';ctx.fillRect(fx,flagY,145,70);
+   ctx.strokeStyle='#facc15';ctx.lineWidth=4;ctx.strokeRect(fx,flagY,145,70);
+
+   ctx.fillStyle='#000';ctx.font='bold 14px Arial';ctx.fillText('📍 CHEGOU!',fx+8,flagY+20);
+   ctx.font='bold 11px Arial';ctx.fillText('TANG 364 - X33',fx+8,flagY+36);
+   ctx.font='bold 10px Arial';ctx.fillStyle='#a855f7';ctx.fillText('BAIA 33',fx+8,flagY+52);
+
+   // FOTO - QUADRADO GRANDE
+   try{
+    if(tangImg.complete && tangImg.naturalWidth>0){
+      ctx.drawImage(tangImg,fx+90,flagY+6,48,48);
+      ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.strokeRect(fx+90,flagY+6,48,48);
+    }else{
+      ctx.fillStyle='#f97316';ctx.fillRect(fx+90,flagY+6,48,48);
+      ctx.fillStyle='#fff';ctx.font='bold 9px Arial';ctx.fillText('TANG',fx+95,flagY+30);
+    }
+   }catch(e){
+      ctx.fillStyle='#f00';ctx.fillRect(fx+90,flagY+6,48,48);
+   }
+ }
+ // PERSONAGEM
+ ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+10,py*H+10,10,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+ ctx.restore();
+ let txt = (px==tx && py==ty &&!(tx==0&&ty==16))? '✅ CHEGOU! BANDEIRA EMBAIXO!' : `INDO... X:${px}->${tx} Y:${py}->${ty}`;
+ document.getElementById('top').innerText=`V48 | ${txt}`;
+}
+function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
+function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;dot[py][px]=false;draw();}
+function ir(x,y){if(tm){clearInterval(tm);tm=null;}tx=x;ty=y;cam=achar(px,py,x,y);if(px==x&&py==y){draw();return;}if(cam.length==0){px=x;py=y;draw();return;}tm=setInterval(step,120);draw();}
+tangImg.onload=()=>draw();
+draw();
+</script>
+</body>
+</html>

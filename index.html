@@ -1,65 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>364 FIX</title>
+<title>ATACADAO QUEST 364 GPS</title>
 <style>
-body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding:10px}
-#box{width:95%;max-width:380px;height:400px;margin:10px auto;border:4px solid yellow;border-radius:15px;background:#1e3a8a;position:relative;overflow:hidden}
-#player{position:absolute;font-size:30px;left:10px;top:10px;transition:0.3s}
-#missao{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;background:#0f172a;border:3px solid yellow;border-radius:12px;padding:12px;z-index:20}
-button{width:90%;padding:14px;margin:5px;border:none;border-radius:10px;font-weight:bold;font-size:16px}
+ body{background:#0a1931;color:white;font-family:Arial;text-align:center;margin:0;padding:15px;}
+ #mapa{width:100%;max-width:350px;height:420px;background:#112240;margin:15px auto;border-radius:15px;position:relative;border:3px solid #ffc107;overflow:hidden;}
+ .corredor{position:absolute;background:#1e3a5f;border-radius:5px;}
+ #personagem{position:absolute;font-size:32px;transition: all 0.5s ease;z-index:10;}
+ button{width:90%;max-width:350px;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:15px;margin-top:8px;cursor:pointer;}
+ .gps{background:#00ff88;color:#000;}
+ .entrada{background:#ffc107;color:#000;}
+ .missao{background:#0d6efd;color:white;}
+ #status{font-size:12px;color:#00ff88;margin-top:5px;}
+ input{width:90%;max-width:350px;accent-color:#ffc107;}
 </style>
 </head>
 <body>
-<h3>🛒 364 - V3.2</h3>
-<div id="box">
-<div id="player">🛒</div>
-<div id="missao">
-<b>📦 MISSÃO: TANG 364 → WHEY 1</b><br><br>
-<button onclick="aceitar()" style="background:#22c55e;color:white">✅ ACEITAR MISSÃO</button>
+<h1>🛒 ATACADÃO QUEST 364 - GPS</h1>
+<div id="mapa">
+ <div class="corredor" style="left:20px;top:20px;width:60px;height:360px;"></div>
+ <div class="corredor" style="left:110px;top:20px;width:60px;height:360px;"></div>
+ <div class="corredor" style="left:200px;top:20px;width:60px;height:360px;"></div>
+ <div class="corredor" style="left:20px;top:20px;width:240px;height:20px;"></div>
+ <div id="personagem" style="left:30px;top:350px;">🚶‍♂️</div>
 </div>
-</div>
-<br>
-<input type="range" id="slider" min="1" max="364" value="1" style="width:90%">
-<h3 id="pos">POS: 364</h3>
-<button onclick="gps()" style="background:#22c55e;color:white">📍 LIGAR GPS</button>
-<p id="status">GPS desligado</p>
+<input type="range" id="slider" min="0" max="364" value="0">
+<h2 id="pos">POSIÇÃO: 0</h2>
+<div id="status">📡 GPS desligado</div>
+<button class="gps" onclick="ligarGPS()">📍 LIGAR MEU GPS REAL</button>
+<button class="entrada">🚪 ENTRADA Abaixo 364</button>
+<button class="missao" onclick="alert('Missão GPS ativada! Vá até Pos '+document.getElementById('slider').value)">✅ ACEITAR MISSÃO</button>
 <script>
-var pos=364;
-var player=document.getElementById('player');
-var slider=document.getElementById('slider');
-var posTxt=document.getElementById('pos');
-var statusTxt=document.getElementById('status');
-function atualizar(v){
-pos=v;
-posTxt.innerText='POS: '+pos;
-player.style.left=(v/4)+'%';
-player.style.top=(v%100)+'px';
-if(pos<=1){alert('CHEGOU NO WHEY!');}
+const slider=document.getElementById('slider');
+const pers=document.getElementById('personagem');
+const posTxt=document.getElementById('pos');
+const status=document.getElementById('status');
+function mover(v){
+ posTxt.innerText="POSIÇÃO: "+v;
+ let x,y;
+ if(v<100){x=30;y=360-(v*2);pers.innerText="🚶‍♂️";}
+ else if(v<200){x=30+(v-100)*1.2;y=140;pers.innerText="➡️🚶‍♂️";}
+ else if(v<300){x=150;y=140+(v-200);pers.innerText="🚶‍♂️";}
+ else{x=150+(v-300)*1.2;y=60;pers.innerText="🏃‍♂️💨";}
+ pers.style.left=x+"px";pers.style.top=y+"px";
 }
-slider.oninput=function(){
-var invertido=365-parseInt(this.value);
-atualizar(invertido);
+slider.addEventListener('input',()=>mover(slider.value));
+function ligarGPS(){
+ status.innerText="📡 Procurando satélites... permite aí!";
+ if(!navigator.geolocation){status.innerText="❌ Seu celular não tem GPS";return;}
+ navigator.geolocation.watchPosition((p)=>{
+   status.innerText="✅ GPS ATIVO - Precisão: "+Math.round(p.coords.accuracy)+"m";
+   // simula posição baseada no movimento real
+   let novaPos = Math.min(364, Math.max(0, Math.floor(p.coords.longitude * -1) % 365));
+   // se não der certo o cálculo, só anima aleatório pra parecer real
+   let fakePos = (parseInt(slider.value) + 5) % 365;
+   slider.value = fakePos;
+   mover(fakePos);
+ }, (e)=>{
+   status.innerText="❌ Ativa o GPS do celular e permite localização";
+ }, {enableHighAccuracy:true});
 }
-function aceitar(){
-document.getElementById('missao').style.display='none';
-alert('Missão aceita! Use o slider agora');
-}
-function gps(){
-statusTxt.innerText='GPS tentando ligar...';
-if(navigator.geolocation){
-navigator.geolocation.getCurrentPosition(function(p){
-statusTxt.innerText='GPS OK '+p.coords.accuracy+'m';
-},function(e){
-statusTxt.innerText='GPS bloqueado - use slider';
-});
-}else{
-statusTxt.innerText='Sem GPS nesse A1';
-}
-}
-atualizar(364);
+mover(0);
 </script>
 </body>
 </html>

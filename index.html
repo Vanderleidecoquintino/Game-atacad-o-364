@@ -1,1 +1,69 @@
-<!DOCTYPE html><html><head><meta charset='utf-8'><meta name="viewport" content="width=device-width,initial-scale=1"><title>ATACADAO QUEST 364</title><style>body{background:#0a1931;color:#fff;font-family:Arial;text-align:center;padding:10px} .card{background:#FFD700;color:#000;padding:15px;border-radius:15px;margin:15px;font-weight:bold} button{background:#0055FF;color:#fff;padding:18px;border:none;border-radius:12px;font-size:18px;width:90%;margin-top:10px} input{width:90%;height:50px}</style></head><body><h2>🛒 ATACADAO QUEST 364</h2><p>De WHEY Pos 1 até TANG Pos 364</p><input type="range" min="0" max="364" value="0" oninput="u(this.value)"><h1 id="p">POSIÇÃO: 0 - ENTRADA</h1><div id="i" class="card">🚪 PORTA - Abaixo da 364</div><button onclick="alert('MISSÃO: Vá até 364 TANG End 449')">✅ ACEITAR MISSÃO</button><script>function u(v){let t="";if(v==0)t="🚪 ENTRADA - Abaixo da 364";else if(v==364)t="🏆 TANG B14 C125 End 449";else if(v==1)t="💪 WHEY B1 C100";else t="📍 Pos "+v+" - Faltam "+(364-v);document.getElementById('p').innerText="POSIÇÃO: "+v;document.getElementById('i').innerText=t;}</script></body></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATACADAO QUEST 364</title>
+<style>
+  body { background:#0a1931; color:white; font-family:Arial; text-align:center; margin:0; padding:20px; }
+  h1 { margin-top:10px; }
+  #mapa { width:100%; max-width:350px; height:400px; background:#112240; margin:20px auto; border-radius:15px; position:relative; border:3px solid #ffc107; overflow:hidden; }
+  .corredor { position:absolute; background:#1e3a5f; border-radius:5px; }
+  #personagem { position:absolute; font-size:32px; transition: all 0.3s ease; z-index:10; filter: drop-shadow(0 0 5px #ffc107); }
+  .item { position:absolute; font-size:12px; background:#00000080; padding:2px 5px; border-radius:5px; }
+  input[type=range] { width:90%; max-width:350px; accent-color:#ffc107; }
+  button { width:90%; max-width:350px; padding:15px; border-radius:12px; border:none; font-weight:bold; font-size:16px; margin-top:10px; cursor:pointer; }
+  .btn-entrada { background:#ffc107; color:#000; }
+  .btn-missao { background:#0d6efd; color:white; }
+</style>
+</head>
+<body>
+  <h1>🛒 ATACADAO QUEST 364</h1>
+  <p>De WHEY Pos 1 até TANG Pos 364</p>
+  
+  <div id="mapa">
+    <div class="corredor" style="left:20px; top:20px; width:60px; height:360px;"></div>
+    <div class="corredor" style="left:110px; top:20px; width:60px; height:360px;"></div>
+    <div class="corredor" style="left:200px; top:20px; width:60px; height:360px;"></div>
+    <div class="corredor" style="left:20px; top:20px; width:240px; height:20px;"></div>
+    
+    <div class="item" style="left:25px; top:350px;">WHEY Pos 1</div>
+    <div class="item" style="left:205px; top:50px;">TANG Pos 364</div>
+    <div class="item" style="left:25px; top:30px; background:#ffc107; color:#000;">🚪 ENTRADA</div>
+    
+    <div id="personagem">🚶‍♂️</div>
+  </div>
+
+  <input type="range" id="posSlider" min="0" max="364" value="0">
+  <h1 id="posTexto">POSIÇÃO: 0</h1>
+  
+  <button class="btn-entrada">🚪 ENTRADA - Abaixo da 364</button>
+  <button class="btn-missao" onclick="aceitar()">✅ ACEITAR MISSÃO</button>
+
+<script>
+  const slider = document.getElementById('posSlider');
+  const pers = document.getElementById('personagem');
+  const texto = document.getElementById('posTexto');
+  
+  function updatePos() {
+    let pos = slider.value;
+    texto.innerText = "POSIÇÃO: " + pos;
+    // faz o bonequinho andar em Zigue-zague pelos corredores
+    let x, y;
+    if(pos < 100) { x = 30; y = 360 - (pos*2); pers.innerText = "🚶‍♂️"; }
+    else if(pos < 200) { x = 30 + (pos-100)*1.2; y = 140; pers.innerText = "🚶‍♂️➡️"; }
+    else if(pos < 300) { x = 140; y = 140 + (pos-200); pers.innerText = "🚶‍♂️"; }
+    else { x = 140 + (pos-300)*1.2; y = 60; pers.innerText = "🏃‍♂️"; }
+    pers.style.left = x + "px";
+    pers.style.top = y + "px";
+  }
+  
+  slider.addEventListener('input', updatePos);
+  updatePos();
+
+  function aceitar(){
+    alert("Missão aceita! 🛒 Vai lá na posição " + slider.value + " buscar! Força da 364!");
+  }
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>V54 - COMBO APP</title>
+<title>V54 - FOTO REAL</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
@@ -14,7 +14,6 @@ canvas{flex:1;width:100%;background:#000;border:3px solid #facc15;touch-action:n
 button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 .bm{background:#222;color:#facc15;font-size:20px}
 .bway{background:#22c55e;color:#000;font-size:11px}
-/* COMBO NORMAL DE APP */
 #combo{height:54px;border-radius:12px;border:2px solid #facc15;background:#fff;color:#000;font-weight:bold;font-size:14px;padding:0 8px;width:100%}
 </style>
 </head>
@@ -43,15 +42,35 @@ button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 <option value="8,10">BEBIDAS</option>
 <option value="10,10">RAÇÃO</option>
 </select>
-<button class="bway" onclick="ir(POS.WAY.x,POS.WAY.y)">ENTRADA</button>
+<button class="bway" onclick="ir(12,15)">ENTRADA</button>
 </div>
 <script>
 const COLS=13,ROWS=19,W=40,H=26;
-const POS={TANG:{x:10,y:1},WAY:{x:12,y:15},ENTRADA:{x:12,y:15}};
+const POS={WAY:{x:12,y:15},ENTRADA:{x:12,y:15}};
 let lab=[],dot=[],px=12,py=15,tx=12,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
 let produtoAtual="TANG 364";
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-const tangImg=new Image();tangImg.src='IMG-20260926-WA7510.jpg';
+
+// FOTOS REAIS - IGUAL TANG
+const listaFotos = {
+"TANG 364":"IMG-20260926-WA7510.jpg",
+"ARROZ":"arroz.jpg",
+"FEIJÃO":"feijao.jpg",
+"ÓLEO":"oleo.jpg",
+"BISCOITO":"biscoito.jpg",
+"REFRI":"refri.jpg",
+"LIMPEZA":"limpeza.jpg",
+"HIGIENE":"higiene.jpg",
+"FRIOS":"frios.jpg",
+"PADARIA":"padaria.jpg",
+"CARNES":"carnes.jpg",
+"FRUTAS":"frutas.jpg",
+"BEBIDAS":"bebidas.jpg",
+"RAÇÃO":"racao.jpg"
+};
+let IMGS={};
+for(let k in listaFotos){let im=new Image();im.src=listaFotos[k];IMGS[k]=im;}
+
 const GPS={
   lat:null,lng:null,ativo:false,
   iniciar(){
@@ -60,10 +79,10 @@ const GPS={
     navigator.geolocation.watchPosition(p=>{
       this.lat=p.coords.latitude;this.lng=p.coords.longitude;this.ativo=true;
       document.getElementById('gps').style.background='#22c55e';
-      document.getElementById('gps').innerText=`🟢 GPS ON | ${this.lat.toFixed(5)}, ${this.lng.toFixed(5)} | VOCE X:${px} Y:${py}`;
+      document.getElementById('gps').innerText=`🟢 GPS ON | ${this.lat.toFixed(5)}`;
     },e=>{
       document.getElementById('gps').style.background='#ef4444';
-      document.getElementById('gps').innerText=`🔴 GPS ERRO: ${e.message}`;
+      document.getElementById('gps').innerText=`🔴 ERRO: ${e.message}`;
     },{enableHighAccuracy:true,maximumAge:0,timeout:10000});
   }
 };
@@ -77,7 +96,6 @@ function init(){
   for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){
     if(y==0||y==8||y==17||x==0||x==12) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0; dot[y][x]=lab[y][x]==0;
   }}
-  let s=localStorage.getItem('v54_pos'); if(s){try{let p=JSON.parse(s);px=p.px;py=p.py;}catch(e){}}
 }
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
@@ -96,20 +114,22 @@ function draw(){
   if(px==tx&&py==ty&&!(tx==POS.WAY.x&&ty==POS.WAY.y)){
     let bx=tx*W,by=ty*H,flagY=by+28,fx=bx-30; if(fx<camX) fx=camX+4; if(fx+130>camX+vw) fx=camX+vw-134;
     ctx.fillStyle='#facc15';ctx.fillRect(bx+18,by+22,4,60);ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,130,56);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,130,56);
-    ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText('📍 '+produtoAtual,fx+6,flagY+18);
-    try{if(tangImg.complete&&tangImg.naturalWidth>0){ctx.drawImage(tangImg,fx+82,flagY+6,42,42);}}catch(e){}
+    ctx.fillStyle='#000';ctx.font='bold 10px Arial';ctx.fillText(produtoAtual,fx+6,flagY+16);
+    try{
+      let foto = IMGS[produtoAtual];
+      if(foto && foto.complete && foto.naturalWidth>0){
+        ctx.drawImage(foto,fx+78,flagY+4,48);
+      }
+    }catch(e){}
   }
   ctx.fillStyle='#facc15';ctx.shadowColor='#facc15';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(px*W+20,py*H+13,11,0,6.28);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.restore();
-  document.getElementById('console').innerText=`V54 COMBO APP | 13 COLUNAS | PRODUTO: ${produtoAtual}\nVOCE=🟡 X${px} Y${py} | GPS:${GPS.ativo?'ON':'OFF'} ${GPS.lat?GPS.lat.toFixed(5):''}`;
-  localStorage.setItem('v54_pos',JSON.stringify({px,py}));
+  document.getElementById('console').innerText=`V54 FOTO REAL | PRODUTO: ${produtoAtual}`;
 }
 function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
 function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
 function ir(x,y){if(tm){clearInterval(tm);tm=null;}if(x==POS.WAY.x&&y==POS.WAY.y) rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){rastro.push({x:px,y:py});px=x;py=y;draw();return;}tm=setInterval(step,120);draw();}
 function loop(){updateCam();draw();requestAnimationFrame(loop);}
-init();resize();draw();loop();tangImg.onload=()=>draw();
-let sx=0,sy=0;cv.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;});
-cv.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)<20&&Math.abs(dy)<20) return; if(Math.abs(dx)>Math.abs(dy)){mover(dx>0?1:-1,0)}else{mover(0,dy>0?1:-1)}});
+init();resize();draw();loop();
 </script>
 </body>
 </html>

@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>V54 - TUDO EM 1 - GPS</title>
+<title>V54 - COMBO BOX</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 #gps{background:#facc15;color:#000;padding:8px;text-align:center;font-size:11px;font-weight:bold;cursor:pointer}
 #console{background:#111;color:#22c55e;padding:5px;font-family:monospace;font-size:9px;white-space:pre;line-height:11px;max-height:60px;overflow:auto;border-bottom:2px solid #facc15}
 canvas{flex:1;width:100%;background:#000;border:3px solid #facc15;touch-action:none}
-.btns{display:grid;grid-template-columns:repeat(4,1fr) 1.2fr 1.2fr;gap:6px;padding:8px;background:#0a0a0a}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;background:#0a0a0a}
+.combo-area{background:#0a0a0a;padding:8px;display:flex;gap:6px}
+#combo{flex:1;height:54px;background:#1a1a1a;color:#facc15;border:2px solid #facc15;border-radius:12px;font-weight:bold;padding:0 12px;font-size:14px}
 button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 .bm{background:#222;color:#facc15;font-size:20px}
 .bprod{background:#a855f7;color:#fff;font-size:11px}
@@ -21,22 +23,42 @@ button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 <div id="gps" onclick="GPS.iniciar()">📍 CLICA AQUI PRA LIGAR O GPS</div>
 <div id="console"></div>
 <canvas id="c"></canvas>
+
+<div class="combo-area">
+<select id="combo" onchange="trocarProduto()">
+<option value="10,1">📍 TANG 364 - C11</option>
+<option value="2,2">🍚 ARROZ - C3</option>
+<option value="4,2">🫘 FEIJÃO - C5</option>
+<option value="6,2">🛢️ ÓLEO - C7</option>
+<option value="8,2">🍪 BISCOITO - C9</option>
+<option value="2,5">🥤 REFRIGERANTE - C3</option>
+<option value="4,5">🧹 LIMPEZA - C5</option>
+<option value="6,5">🧴 HIGIENE - C7</option>
+<option value="8,5">🧀 FRIOS - C9</option>
+<option value="2,10">🍞 PADARIA - C3</option>
+<option value="4,10">🥩 CARNES - C5</option>
+<option value="6,10">🍎 FRUTAS - C7</option>
+<option value="8,10">🍺 BEBIDAS - C9</option>
+<option value="10,10">🐶 RAÇÃO - C11</option>
+</select>
+<button class="bway" style="width:110px" onclick="ir(POS.WAY.x,POS.WAY.y)">ENTRADA</button>
+</div>
+
 <div class="btns">
 <button class="bm" onclick="mover(-1,0)">←</button>
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<button class="bprod" onclick="ir(POS.TANG.x,POS.TANG.y)">TANG 364</button>
-<button class="bway" onclick="ir(POS.WAY.x,POS.WAY.y)">ENTRADA</button>
 </div>
+
 <script>
 const COLS=13,ROWS=19,W=40,H=26;
-const POS={TANG:{x:10,y:1},WAY:{x:12,y:15},ENTRADA:{x:12,y:15}};
-let lab=[],dot=[],px=12,py=15,tx=12,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
+const POS={WAY:{x:12,y:15},ENTRADA:{x:12,y:15}};
+let produtoAtual="TANG 364";
+let lab=[],dot=[],px=12,py=15,tx=10,ty=1,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 const tangImg=new Image();tangImg.src='IMG-20260926-WA7510.jpg';
 
-// GPS
 const GPS={
   lat:null,lng:null,ativo:false,
   iniciar(){
@@ -53,43 +75,17 @@ const GPS={
   }
 };
 
+function trocarProduto(){
+  let v=document.getElementById('combo').value.split(',');
+  let nome=document.getElementById('combo').options[document.getElementById('combo').selectedIndex].text;
+  produtoAtual=nome;
+  ir(parseInt(v[0]),parseInt(v[1]));
+}
+
 function init(){
   for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){
     if(y==0||y==8||y==17||x==0||x==12) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0; dot[y][x]=lab[y][x]==0;
   }}
   let s=localStorage.getItem('v54_pos'); if(s){try{let p=JSON.parse(s);px=p.px;py=p.py;}catch(e){}}
 }
-function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
-function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
-function resize(){vw=cv.clientWidth;vh=cv.clientHeight;let dpr=devicePixelRatio||1;cv.width=vw*dpr;cv.height=vh*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}
-window.addEventListener('resize',resize);
-function updateCam(){let tX=px*W - vw/2 + W/2, tY=py*H - vh/2 + H/2; camX+=(tX-camX)*0.15; camY+=(tY-camY)*0.15; camX=Math.max(0,Math.min(camX,COLS*W-vw)); camY=Math.max(0,Math.min(camY,ROWS*H-vh));}
-function draw(){
-  updateCam(); ctx.fillStyle='#000';ctx.fillRect(0,0,vw,vh); ctx.save();ctx.translate(-camX,-camY);
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
-    if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);ctx.fillStyle='#93c5fd';ctx.font='bold 10px Arial';ctx.fillText('B'+(x+1),x*W+4,y*H+15);}
-    else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+20,y*H+13,2.5,0,6.28);ctx.fill();}
-  }
-  ctx.fillStyle='#22c55e';ctx.fillRect(POS.ENTRADA.x*W-4,POS.ENTRADA.y*H-4,W+8,H+8);ctx.fillStyle='#000';ctx.font='bold 8px Arial';ctx.fillText('ENTRADA',POS.ENTRADA.x*W-2,POS.ENTRADA.y*H+4);ctx.fillText('DA LOJA',POS.ENTRADA.x*W-1,POS.ENTRADA.y*H+12);
-  for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle=`rgba(34,197,94,${0.4+a*0.6})`;ctx.beginPath();ctx.arc(p.x*W+20,p.y*H+13,6*a+2,0,6.28);ctx.fill();}
-  if(!(tx==POS.WAY.x&&ty==POS.WAY.y)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}
-  if(px==tx&&py==ty&&!(tx==POS.WAY.x&&ty==POS.WAY.y)){
-    let bx=tx*W,by=ty*H,flagY=by+28,fx=bx-30; if(fx<camX) fx=camX+4; if(fx+130>camX+vw) fx=camX+vw-134;
-    ctx.fillStyle='#facc15';ctx.fillRect(bx+18,by+22,4,60);ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,130,56);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,130,56);
-    ctx.fillStyle='#000';ctx.font='bold 12px Arial';ctx.fillText('📍 TANG 364',fx+6,flagY+18);
-    try{if(tangImg.complete&&tangImg.naturalWidth>0){ctx.drawImage(tangImg,fx+82,flagY+6,42,42);}}catch(e){}
-  }
-  ctx.fillStyle='#facc15';ctx.shadowColor='#facc15';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(px*W+20,py*H+13,11,0,6.28);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.restore();
-  document.getElementById('console').innerText=`V54 TUDO EM 1 | 13 COLUNAS | ENTRADA LOJA X${POS.WAY.x} Y${POS.WAY.y}\nVOCE=🟡 X${px} Y${py} | GPS:${GPS.ativo?'ON':'OFF'} ${GPS.lat?GPS.lat.toFixed(5):''}`;
-  localStorage.setItem('v54_pos',JSON.stringify({px,py}));
-}
-function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){if(tm){clearInterval(tm);tm=null;}if(x==POS.WAY.x&&y==POS.WAY.y) rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){rastro.push({x:px,y:py});px=x;py=y;draw();return;}tm=setInterval(step,120);draw();}
-function loop(){updateCam();draw();requestAnimationFrame(loop);}
-init();resize();draw();loop();tangImg.onload=()=>draw();
-let sx=0,sy=0;cv.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;});
-cv.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)<20&&Math.abs(dy)<20) return; if(Math.abs(dx)>Math.abs(dy)){mover(dx>0?1:-1,0)}else{mover(0,dy>0?1:-1)}});
-</script>
-</body>
-</html>
+function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y]

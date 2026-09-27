@@ -3,77 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V54 - MAPA + COMBO</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;color:#fff;font-family:Arial;height:100vh;display:flex;flex-direction:column}
-#gps{background:#facc15;color:#000;padding:10px;text-align:center;font-weight:bold;cursor:pointer}
-#console{background:#111;color:#22c55e;padding:5px;font-family:monospace;font-size:9px;height:40px}
-#c{width:100%;height:55vh;background:#111;border-top:3px solid #facc15;border-bottom:3px solid #facc15;display:block}
-.combo-area{background:#0a0a0a;padding:8px;display:flex;gap:6px}
-#combo{flex:1;height:54px;background:#222;color:#facc15;border:2px solid #facc15;border-radius:12px;font-weight:bold;padding:0 12px}
-.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;background:#0a0a0a}
-button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
-.bm{background:#333;color:#facc15;font-size:22px}
-.bway{background:#22c55e;color:#000}
-</style>
+<title>V54 SIMPLES</title>
 </head>
-<body>
-<div id="gps" onclick="GPS.iniciar()">📍 CLICA AQUI PRA LIGAR O GPS</div>
-<div id="console">CARREGANDO MAPA...</div>
-<canvas id="c"></canvas>
+<body style="background:#000;color:#fff;font-family:Arial;margin:0;padding:10px">
 
-<div class="combo-area">
-<select id="combo" onchange="trocarProduto()">
-<option value="10,1">📍 TANG 364</option>
-<option value="2,2">🍚 ARROZ C3</option>
-<option value="4,2">🫘 FEIJAO C5</option>
-<option value="6,2">🛢️ OLEO C7</option>
-<option value="8,2">🍪 BISCOITO C9</option>
-<option value="2,5">🥤 REFRIGERANTE</option>
-<option value="4,5">🧹 LIMPEZA</option>
-<option value="6,5">🧴 HIGIENE</option>
-<option value="10,10">🐶 RACAO C11</option>
+<div style="background:yellow;color:#000;padding:10px;text-align:center;font-weight:bold" onclick="alert('GPS ligado!')">📍 LIGAR GPS</div>
+
+<div style="background:#111;color:#0f0;padding:5px;font-size:10px;margin:5px 0">V54 - 13 COLUNAS - ENTRADA DA LOJA</div>
+
+<canvas id="c" width="320" height="400" style="background:#222;border:3px solid yellow;width:100%;display:block"></canvas>
+
+<div style="margin:10px 0;display:flex;gap:5px">
+<select id="combo" style="flex:1;height:50px;background:#222;color:yellow;border:2px solid yellow;font-weight:bold" onchange="trocar()">
+<option value="10,1">TANG 364 - C11</option>
+<option value="2,2">ARROZ C3</option>
+<option value="4,2">FEIJAO C5</option>
+<option value="6,2">OLEO C7</option>
+<option value="2,5">REFRI C3</option>
+<option value="4,5">LIMPEZA C5</option>
+<option value="6,10">FRUTAS C7</option>
+<option value="10,10">RACAO C11</option>
 </select>
-<button class="bway" onclick="ir(12,15)">ENTRADA</button>
+<button style="width:80px;height:50px;background:green;color:#fff;font-weight:bold;border:2px solid yellow" onclick="ir(12,15)">ENTRADA</button>
 </div>
 
-<div class="btns">
-<button class="bm" onclick="mover(-1,0)">←</button>
-<button class="bm" onclick="mover(0,-1)">↑</button>
-<button class="bm" onclick="mover(0,1)">↓</button>
-<button class="bm" onclick="mover(1,0)">→</button>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
+<button style="height:50px;background:#333;color:yellow;border:2px solid yellow;font-size:20px" onclick="mover(-1,0)">←</button>
+<button style="height:50px;background:#333;color:yellow;border:2px solid yellow;font-size:20px" onclick="mover(0,-1)">↑</button>
+<button style="height:50px;background:#333;color:yellow;border:2px solid yellow;font-size:20px" onclick="mover(0,1)">↓</button>
+<button style="height:50px;background:#333;color:yellow;border:2px solid yellow;font-size:20px" onclick="mover(1,0)">→</button>
 </div>
+
+<div id="info" style="text-align:center;margin-top:10px;color:yellow;font-weight:bold">PRODUTO: TANG 364 | VOCE X12 Y15</div>
 
 <script>
-const COLS=13,ROWS=19,W=40,H=26;
-let produtoAtual="TANG 364";
-let lab=[],px=12,py=15,tx=10,ty=1,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var COLS=13,ROWS=19,W=24,H=20;
+var px=12,py=15,tx=10,ty=1,lab=[],rastro=[];
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var produto="TANG 364";
 
-const GPS={ativo:false,iniciar(){
-  if(!navigator.geolocation){document.getElementById('gps').innerText='GPS NAO SUPORTADO';return;}
-  document.getElementById('gps').innerText='BUSCANDO GPS...';
-  navigator.geolocation.watchPosition(p=>{
-    this.ativo=true;
-    document.getElementById('gps').style.background='#22c55e';
-    document.getElementById('gps').innerText=`GPS ON ${p.coords.latitude.toFixed(5)}`;
-  },e=>{
-    document.getElementById('gps').style.background='#ef4444';
-    document.getElementById('gps').innerText='GPS ERRO: '+e.message;
-  },{enableHighAccuracy:true});
-}};
+for(var y=0;y<ROWS;y++){lab[y]=[];for(var x=0;x<COLS;x++){
+if(y==0||y==8||y==17||x==0||x==12) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0;
+}}
 
-function trocarProduto(){
-  let v=document.getElementById('combo').value.split(',');
-  let t=document.getElementById('combo').options[document.getElementById('combo').selectedIndex].text;
-  produtoAtual=t; ir(parseInt(v[0]),parseInt(v[1]));
-}
-function init(){
-  for(let y=0;y<ROWS;y++){lab[y]=[];for(let x=0;x<COLS;x++){
-    if(y==0||y==8||y==17||x==0||x==12) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0;
-  }}
-}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
-function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
-function resize(){vw=cv.clientWidth;vh=cv.clientHeight;let dpr=window.devicePixelRatio||1;cv.width
+
+function draw(){
+ctx.fillStyle='#000';ctx.fillRect(0,0,320,400);
+for(var y=0;y<ROWS;y++)for(var x=0;x<COLS;x++){
+if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W-2,H-2);}
+else{ctx.fillStyle='#333';ctx.fillRect(x*W,y*H,W-2,H-2);}
+}
+ctx.fillStyle='#00ff00';ctx.fillRect(12*W,15*H,W,H);
+ctx.fillStyle='#000';ctx.font='6px Arial';ctx.fillText('ENTRADA',12*W,15*H+8);
+
+for(var i=0;i<rastro.length;i++){ctx.fillStyle='#0f0';ctx.fillRect(rastro[i].x*W+8,rastro[i].y*H+8,6,6);}
+
+if(!(tx==12&&ty==15)){ctx.fillStyle='red';ctx.fillRect(tx*W,ty*H,W,H);}
+
+ctx.fillStyle='yellow';ctx.beginPath();ctx.arc(px*W+12,py*H+10,8,0,6.28);ctx.fill();
+ctx.strokeStyle='#fff';ctx.stroke();
+
+if(px==tx&&py==ty){ctx.fillStyle='#fff';ctx.fillRect(tx*W-10,ty*H-20,80,14);ctx.fillStyle='#000';ctx.fillText(produto,tx*W-8,ty*H-11);}
+
+document.getElementById('info').innerHTML='PRODUTO: '+produto+' | VOCE X'+px+' Y'+py;
+}
+
+function mover(dx,dy){var nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>15) rastro.shift();px=nx;py=ny;draw();}
+function ir(x,y){tx=x;ty=y;px=x;py=y;rastro=[];draw();}
+function trocar(){
+var sel=document.getElementById('combo');
+var v=sel.value.split(',');
+var t=sel.options[sel.selectedIndex].text;
+produto=t;
+ir(parseInt(v[0]),parseInt(v[1]));
+}
+
+draw();
+</script>
+
+</body>
+</html>

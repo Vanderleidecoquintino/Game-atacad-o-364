@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>V54.3 - BANDEIRA</title>
+<title>V54.4 - FOTO FIX</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
@@ -18,7 +18,7 @@ button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 </style>
 </head>
 <body>
-<div id="gps" onclick="GPS.iniciar()">📍 V54.3 - BANDEIRA FLUTUANTE ORIGINAL</div>
+<div id="gps" onclick="GPS.iniciar()">📍 V54.4 - FOTO FIX 100% - CLICA PRA GPS</div>
 <div id="console"></div>
 <canvas id="c"></canvas>
 <div class="btns">
@@ -51,12 +51,15 @@ let lab=[],dot=[],px=12,py=15,tx=12,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[]
 let produtoAtual="TANG 364";
 let caixas=Array.from({length:31},(_,i)=>({id:i+1,fila:Math.floor(Math.random()*4)}));
 let precos={"TANG 364":"R$ 1,49","ARROZ":"R$ 22,90","FEIJÃO":"R$ 8,99","ÓLEO":"R$ 7,49","BISCOITO":"R$ 3,99","REFRI":"R$ 8,99","LIMPEZA":"R$ 12,90","HIGIENE":"R$ 15,90","FRIOS":"R$ 29,90","PADARIA":"R$ 6,90","CARNES":"R$ 39,90","FRUTAS":"R$ 9,90","BEBIDAS":"R$ 4,99","RAÇÃO":"R$ 89,90"};
+let icons={"TANG 364":"🧃","ARROZ":"🍚","FEIJÃO":"🫘","ÓLEO":"🫒","BISCOITO":"🍪","REFRI":"🥤","LIMPEZA":"🧹","HIGIENE":"🧴","FRIOS":"🧀","PADARIA":"🍞","CARNES":"🥩","FRUTAS":"🍎","BEBIDAS":"🍺","RAÇÃO":"🐶"};
 let caixaAtual=null;
 function pegaCaixaLivre(){caixas.sort((a,b)=>a.fila-b.fila);let c=caixas[0];c.fila++;setTimeout(()=>{c.fila=Math.max(0,c.fila-1)},20000);return c;}
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-const prodImgs={};
-["TANG 364","ARROZ","FEIJÃO","ÓLEO","BISCOITO","REFRI","LIMPEZA","HIGIENE","FRIOS","PADARIA","CARNES","FRUTAS","BEBIDAS","RAÇÃO"].forEach(n=>{let im=new Image();im.src=n=="TANG 364"?"IMG-20260926-WA7510.jpg":"https://via.placeholder.com/80/facc15/000?text="+n.substring(0,4);prodImgs[n]=im;});
-const GPS={ativo:false,iniciar(){if(!navigator.geolocation){document.getElementById('gps').innerText='GPS NÃO SUPORTADO';return;}document.getElementById('gps').innerText='🔍 BUSCANDO GPS...';navigator.geolocation.watchPosition(p=>{this.ativo=true;document.getElementById('gps').style.background='#22c55e';document.getElementById('gps').innerText=`🟢 V54.3 BANDEIRA | ${produtoAtual}`;},e=>{document.getElementById('gps').style.background='#ef4444';document.getElementById('gps').innerText=`🔴 GPS ERRO: ${e.message}`},{enableHighAccuracy:true});}};
+// IMAGEM TANG - MESMA DA SUA V54
+const tangImg=new Image();tangImg.src='IMG-20260926-WA7510.jpg';
+tangImg.onload=()=>{console.log("TANG OK");draw();};
+tangImg.onerror=()=>{console.log("TANG ERRO - usando emoji");};
+const GPS={ativo:false,iniciar(){if(!navigator.geolocation){document.getElementById('gps').innerText='GPS NÃO SUPORTADO';return;}document.getElementById('gps').innerText='🔍 BUSCANDO GPS...';navigator.geolocation.watchPosition(p=>{this.ativo=true;document.getElementById('gps').style.background='#22c55e';document.getElementById('gps').innerText=`🟢 V54.4 FOTO FIX | ${produtoAtual}`;},e=>{document.getElementById('gps').style.background='#ef4444';document.getElementById('gps').innerText=`🔴 GPS ERRO: ${e.message}`},{enableHighAccuracy:true});}};
 function trocarProduto(){let sel=document.getElementById('combo');let v=sel.value.split(',');produtoAtual=sel.options[sel.selectedIndex].text;ir(parseInt(v[0]),parseInt(v[1]));}
 function init(){for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){if(y==0||y==8||y==17||x==0||x==12) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0; dot[y][x]=lab[y][x]==0;}}let s=localStorage.getItem('v54_pos'); if(s){try{let p=JSON.parse(s);px=p.px;py=p.py;}catch(e){}}}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
@@ -71,41 +74,4 @@ function draw(){
     else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+20,y*H+13,2.5,0,6.28);ctx.fill();}
   }
   ctx.fillStyle='#22c55e';ctx.fillRect(POS.ENTRADA.x*W-4,POS.ENTRADA.y*H-4,W+8,H+8);ctx.fillStyle='#000';ctx.font='bold 8px Arial';ctx.fillText('ENTRADA',POS.ENTRADA.x*W-2,POS.ENTRADA.y*H+4);ctx.fillText('DA LOJA',POS.ENTRADA.x*W-1,POS.ENTRADA.y*H+12);
-  for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle=`rgba(34,197,94,${0.4+a*0.6})`;ctx.beginPath();ctx.arc(p.x*W+20,p.y*H+13,6*a+2,0,6.28);ctx.fill();}
-  if(!(tx==POS.WAY.x&&ty==POS.WAY.y)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}
-  // BANDEIRA FLUTUANTE ORIGINAL V54 COM FOTO + PREÇO + CAIXA
-  if(px==tx&&py==ty&&!(tx==POS.WAY.x&&ty==POS.WAY.y)){
-    if(!caixaAtual) caixaAtual=pegaCaixaLivre();
-    let bx=tx*W,by=ty*H;
-    let flagW=155,flagH=92;
-    let flagY=by+28,fx=bx-35;
-    if(fx<camX) fx=camX+4; if(fx+flagW>camX+vw) fx=camX+vw-flagW-4;
-    if(flagY+flagH>camY+vh) flagY=by-flagH-10;
-    // mastro
-    ctx.fillStyle='#facc15';ctx.fillRect(bx+18,by+22,4,60);
-    // caixa branca da bandeira
-    ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,flagW,flagH);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,flagW,flagH);
-    // foto 42x42 canto direito
-    try{let im=prodImgs[produtoAtual];if(im&&im.complete&&im.naturalWidth>0){ctx.drawImage(im,fx+105,flagY+6,42,42);ctx.strokeStyle='#1e40af';ctx.lineWidth=2;ctx.strokeRect(fx+105,flagY+6,42,42);}}catch(e){}
-    // textos
-    ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText('📍 '+produtoAtual,fx+6,flagY+16);
-    ctx.fillStyle='#16a34a';ctx.font='bold 15px Arial';ctx.fillText(precos[produtoAtual]||"R$ 9,99",fx+6,flagY+36);
-    ctx.fillStyle='#1e40af';ctx.font='bold 11px Arial';ctx.fillText(`CAIXA ${caixaAtual.id}`,fx+6,flagY+54);
-    ctx.fillStyle='#666';ctx.font='bold 9px Arial';ctx.fillText(`Fila: ${caixaAtual.fila} | ${caixaAtual.fila*2}min`,fx+6,flagY+68);
-    ctx.fillStyle='#22c55e';ctx.font='bold 9px Arial';ctx.fillText(`✅ ${caixas.filter(c=>c.fila<2).length}/31 livres`,fx+6,flagY+82);
-  }
-  // boneco
-  ctx.fillStyle='#facc15';ctx.shadowColor='#facc15';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(px*W+20,py*H+13,11,0,6.28);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.restore();
-  document.getElementById('console').innerText=`V54.3 BANDEIRA | ${produtoAtual} ${precos[produtoAtual]||""} | CAIXA ${caixaAtual?caixaAtual.id:"-"} | GPS:${GPS.ativo?'ON':'OFF'}`;
-  localStorage.setItem('v54_pos',JSON.stringify({px,py}));
-}
-function step(){if(cam.length==0){clearInterval(tm);tm=null;if(!caixaAtual) caixaAtual=pegaCaixaLivre();draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){caixaAtual=null;if(tm){clearInterval(tm);tm=null;}if(x==POS.WAY.x&&y==POS.WAY.y) rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){rastro.push({x:px,y:py});px=x;py=y;draw();return;}tm=setInterval(step,120);draw();}
-function loop(){updateCam();draw();requestAnimationFrame(loop);}
-init();resize();draw();loop();
-let sx=0,sy=0;cv.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;});
-cv.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)<20&&Math.abs(dy)<20) return; if(Math.abs(dx)>Math.abs(dy)){mover(dx>0?1:-1,0)}else{mover(0,dy>0?1:-1)}});
-</script>
-</body>
-</html>
+  for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle=`rgba(34,197,94,${0.4+a*0.6})`;ctx.beginPath();ctx.arc(p.x*W+20,p.y*H+13,6

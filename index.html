@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>V54.7 MATRIX PONTO A PONTO</title>
+<title>V54.6 EMOJI + MATRIX</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
@@ -18,7 +18,7 @@ button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 </style>
 </head>
 <body>
-<div id="gps">V54.7 - MATRIX PONTO A PONTO + EMOJI - 1-2 NA DIREITA</div>
+<div id="gps">V54.6 - MATRIX PONTO A PONTO + EMOJI</div>
 <div id="console">OK - 40 ITENS COM EMOJI</div>
 <canvas id="c"></canvas>
 <div class="btns">
@@ -27,7 +27,7 @@ button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
 <select id="combo" onchange="trocarProduto()">
-<option value="24,1">🧃 TANG 364</option>
+<option value="10,1">🧃 TANG 364</option>
 <option value="2,2">🍚 ARROZ 5KG</option>
 <option value="4,2">🫘 FEIJAO 1KG</option>
 <option value="6,2">🫒 OLEO 900ML</option>
@@ -68,52 +68,44 @@ button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
 <option value="8,12">🐶 RACAO CAO</option>
 <option value="10,12">🐱 RACAO GATO</option>
 </select>
-<button class="bway" onclick="ir(24,15)">ENTRADA</button>
+<button class="bway" onclick="ir(12,15)">ENTRADA</button>
 </div>
 <script>
-const COLS=27,ROWS=19,W=40,H=26;
-let lab=[],dot=[],px=24,py=15,tx=24,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
+const COLS=13,ROWS=19,W=40,H=26;
+let lab=[],dot=[],px=12,py=15,tx=12,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
 let produtoAtual="TANG 364";
-let caixas=[];for(let i=0;i<31;i++) caixas.push({id:i+1,fila:Math.floor(Math.random()*4)});
+let caixas=[];
+for(let i=0;i<31;i++) caixas.push({id:i+1,fila:Math.floor(Math.random()*4)});
 let precos={"TANG 364":"R$ 1,49","ARROZ 5KG":"R$ 22,90","FEIJAO 1KG":"R$ 8,99","OLEO 900ML":"R$ 7,49","ACUCAR 1KG":"R$ 4,99","CAFE 500G":"R$ 14,90","MACARRAO":"R$ 3,99","BISCOITO":"R$ 3,49","LEITE 1L":"R$ 4,89","MANTEIGA":"R$ 9,90","QUEIJO":"R$ 29,90","REFRI 2L":"R$ 8,99","AGUA 500ML":"R$ 2,49","CERVEJA":"R$ 3,99","SUCO CAIXA":"R$ 6,99","ENERGETICO":"R$ 7,99","SABAO PO":"R$ 12,90","DETERGENTE":"R$ 2,49","AMACIANTE":"R$ 9,90","DESINFETANTE":"R$ 6,99","PAPEL HIG":"R$ 15,90","SABONETE":"R$ 2,99","SHAMPOO":"R$ 15,90","CREME DENTAL":"R$ 4,99","DESODORANTE":"R$ 12,90","PAO FRANCES":"R$ 0,89","BOLO":"R$ 6,90","PRESUNTO":"R$ 32,90","MUSSARELA":"R$ 39,90","CARNE MOIDA":"R$ 29,90","FRANGO":"R$ 18,90","LINGUICA":"R$ 22,90","OVOS 12UN":"R$ 14,90","TOMATE":"R$ 7,90","BATATA":"R$ 5,90","CEBOLA":"R$ 4,90","BANANA":"R$ 6,90","MACA":"R$ 9,90","RACAO CAO":"R$ 89,90","RACAO GATO":"R$ 79,90"};
 let icons={"TANG 364":"🧃","ARROZ 5KG":"🍚","FEIJAO 1KG":"🫘","OLEO 900ML":"🫒","ACUCAR 1KG":"🍬","CAFE 500G":"☕","MACARRAO":"🍝","BISCOITO":"🍪","LEITE 1L":"🥛","MANTEIGA":"🧈","QUEIJO":"🧀","REFRI 2L":"🥤","AGUA 500ML":"💧","CERVEJA":"🍺","SUCO CAIXA":"🧃","ENERGETICO":"⚡","SABAO PO":"🧼","DETERGENTE":"🧴","AMACIANTE":"👕","DESINFETANTE":"✨","PAPEL HIG":"🧻","SABONETE":"🧼","SHAMPOO":"💆","CREME DENTAL":"🪥","DESODORANTE":"💨","PAO FRANCES":"🍞","BOLO":"🍰","PRESUNTO":"🍖","MUSSARELA":"🧀","CARNE MOIDA":"🥩","FRANGO":"🍗","LINGUICA":"🌭","OVOS 12UN":"🥚","TOMATE":"🍅","BATATA":"🥔","CEBOLA":"🧅","BANANA":"🍌","MACA":"🍎","RACAO CAO":"🐶","RACAO GATO":"🐱"};
 let caixaAtual=null;
 function pegaCaixa(){caixas.sort((a,b)=>a.fila-b.fila);let c=caixas[0];c.fila++;setTimeout(function(){c.fila=Math.max(0,c.fila-1)},20000);return c;}
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 function trocarProduto(){let sel=document.getElementById('combo');let txt=sel.options[sel.selectedIndex].text;let clean=txt.substring(2).trim();produtoAtual=clean;let v=sel.value.split(',');ir(parseInt(v[0]),parseInt(v[1]));}
-function init(){lab=[];dot=[];for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){if(y==0||y==8||y==17||x==0||x==COLS-1) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0; dot[y][x]=lab[y][x]==0;}}}
+function init(){lab=[];dot=[];for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){if(y==0||y==8||y==17||x==0||x==12) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0; dot[y][x]=lab[y][x]==0;}}}
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v={};v[sx+','+sy]=1;while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;let dirs=[[1,0],[-1,0],[0,1],[0,-1]];for(let i=0;i<dirs.length;i++){let nx=c.x+dirs[i][0],ny=c.y+dirs[i][1],k=nx+','+ny;if(!v[k]&&livre(nx,ny)){v[k]=1;q.push({x:nx,y:ny,p:c.p.concat([{x:nx,y:ny}])})}}}return []}
 function resize(){let r=cv.getBoundingClientRect();vw=r.width;vh=r.height;if(vh<300) vh=400;cv.width=vw;cv.height=vh;}
 window.addEventListener('resize',function(){resize();draw();});
-function updateCam(){let tX=px*W - vw/2 + W/2, tY=py*H - vh/2 + H/2; camX+=(tX-camX)*0.12; camY+=(tY-camY)*0.12;let maxX=Math.max(0,COLS*W-vw);let maxY=Math.max(0,ROWS*H-vh);if(camX<0) camX=0; if(camX>maxX) camX=maxX; if(camY<0) camY=0; if(camY>maxY) camY=maxY;}
+function updateCam(){let tX=px*W - vw/2 + W/2, tY=py*H - vh/2 + H/2; camX+=(tX-camX)*0.15; camY+=(tY-camY)*0.15;let maxX=Math.max(0,COLS*W-vw);let maxY=Math.max(0,ROWS*H-vh);if(camX<0) camX=0; if(camX>maxX) camX=maxX; if(camY<0) camY=0; if(camY>maxY) camY=maxY;}
 function draw(){
   updateCam();
   ctx.fillStyle='#000';ctx.fillRect(0,0,vw,vh);
   ctx.save();ctx.translate(-camX,-camY);
-  // NUMEROS EM CIMA DAS AZUIS - DIREITA PRA ESQUERDA
-  const maxBlueX = COLS-2;
-  ctx.textAlign='center';
-  for(let x=1;x<COLS;x+=2){
-    let idx = (maxBlueX - x)/2;
-    if(idx<0) continue;
-    let n1 = idx*2+1, n2=n1+1;
-    ctx.fillStyle='#facc15';ctx.font='bold 11px Arial';
-    ctx.fillText(n1+'-'+n2, x*W+20, 14);
-  }
   for(let y=0;y<ROWS;y++){for(let x=0;x<COLS;x++){
-    if(lab[y][x]==1){ctx.fillStyle='#0a194e';ctx.fillRect(x*W,y*H,W,H);ctx.fillStyle='#1e40af';ctx.fillRect(x*W+1,y*H+1,W-2,H-2);ctx.fillStyle='#93c5fd';ctx.font='bold 10px Arial';ctx.textAlign='left';ctx.fillText('B'+(x+1),x*W+4,y*H+15);}
-    else if(dot[y][x] && y!=0){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+20,y*H+13,2.5,0,6.28);ctx.fill();}
+    if(lab[y][x]==1){ctx.fillStyle='#0a194e';ctx.fillRect(x*W,y*H,W,H);ctx.fillStyle='#1e40af';ctx.fillRect(x*W+1,y*H+1,W-2,H-2);ctx.fillStyle='#93c5fd';ctx.font='bold 10px Arial';ctx.fillText('B'+(x+1),x*W+4,y*H+15);}
+    else if(dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+20,y*H+13,2.5,0,6.28);ctx.fill();}
   }}
-  ctx.fillStyle='#22c55e';ctx.fillRect(24*W-4,15*H-4,W+8,H+8);ctx.fillStyle='#000';ctx.font='bold 8px Arial';ctx.textAlign='left';ctx.fillText('ENTRADA',24*W-2,15*H+4);
+  ctx.fillStyle='#22c55e';ctx.fillRect(12*W-4,15*H-4,W+8,H+8);ctx.fillStyle='#000';ctx.font='bold 8px Arial';ctx.fillText('ENTRADA',12*W-2,15*H+4);
   for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle='rgba(34,197,94,'+(0.4+a*0.6)+')';ctx.beginPath();ctx.arc(p.x*W+20,p.y*H+13,6*a+2,0,6.28);ctx.fill();}
-  if(!(tx==24&&ty==15)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}
-  if(px==tx&&py==ty&&!(tx==24&&ty==15)){
+  if(!(tx==12&&ty==15)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}
+  if(px==tx&&py==ty&&!(tx==12&&ty==15)){
     if(!caixaAtual) caixaAtual=pegaCaixa();
     let bx=tx*W,by=ty*H,flagW=165,flagH=85,flagY=by+28,fx=bx-35;
     if(fx<camX) fx=camX+4; if(fx+flagW>camX+vw) fx=camX+vw-flagW-4; if(flagY+flagH>camY+vh) flagY=by-flagH-10;
     ctx.fillStyle='#facc15';ctx.fillRect(bx+18,by+22,4,60);
     ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,flagW,flagH);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,flagW,flagH);
+    // emoji grande na bandeira
     ctx.fillStyle='#f3f4f6';ctx.fillRect(fx+108,flagY+6,48,32);ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1;ctx.strokeRect(fx+108,flagY+6,48,32);
     ctx.font='24px Arial';ctx.textAlign='center';ctx.fillText(icons[produtoAtual]||'📦',fx+132,flagY+28);ctx.textAlign='left';
     ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText(produtoAtual,fx+6,flagY+16);
@@ -123,13 +115,16 @@ function draw(){
   }
   ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+20,py*H+13,11,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
   ctx.restore();
-  document.getElementById('console').innerText='V54.7 ANDANDO LISO | '+(icons[produtoAtual]||'')+' '+produtoAtual+' '+(precos[produtoAtual]||'')+' | CAIXA '+(caixaAtual?caixaAtual.id:'-')+' | PONTO A PONTO';
+  document.getElementById('console').innerText='V54.6 EMOJI OK | '+(icons[produtoAtual]||'')+' '+produtoAtual+' '+(precos[produtoAtual]||'')+' | CAIXA '+(caixaAtual?caixaAtual.id:'-')+' | PONTO A PONTO';
 }
 function step(){if(cam.length==0){clearInterval(tm);tm=null;if(!caixaAtual) caixaAtual=pegaCaixa();draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();}
 function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){caixaAtual=null;if(tm){clearInterval(tm);tm=null;}if(x==24&&y==15) rastro=[];if(lab[y][x]==1){if(x>0&&lab[y][x-1]!=1) x--; else if(x<COLS-1&&lab[y][x+1]!=1) x++;}tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){px=x;py=y;draw();return;}tm=setInterval(step,110);draw();}
+function ir(x,y){caixaAtual=null;if(tm){clearInterval(tm);tm=null;}if(x==12&&y==15) rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){px=x;py=y;draw();return;}tm=setInterval(step,120);draw();}
 function loop(){updateCam();draw();requestAnimationFrame(loop);}
 init();resize();draw();loop();
 let sx=0,sy=0;
 cv.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;});
-cv.addEventListener('touchend',function(e){let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)<20&&Math.abs(dy)<20) return; if(Math.abs(dx)>Math.abs(dy)){m
+cv.addEventListener('touchend',function(e){let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)<20&&Math.abs(dy)<20) return; if(Math.abs(dx)>Math.abs(dy)){mover(dx>0?1:-1,0)}else{mover(0,dy>0?1:-1)}});
+</script>
+</body>
+</html>

@@ -2,121 +2,110 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>V55.1 LISTA INTELIGENTE FIX</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V55.3 DIV - SEMPRE FUNCIONA</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-#gps{background:#facc15;color:#000;padding:6px;text-align:center;font-size:11px;font-weight:bold}
-#listaView{background:#111;padding:6px;max-height:95px;overflow:auto;border-bottom:2px solid #22c55e;font-size:10px}
-.itemLista{display:inline-block;background:#22c55e;color:#000;padding:3px 8px;margin:2px;border-radius:12px;font-size:10px;font-weight:bold}
-canvas{flex:1;width:100%;background:#000;border:3px solid #facc15;touch-action:none;display:block;min-height:350px}
-.btns{display:grid;grid-template-columns:repeat(4,1fr) 1.5fr 1fr;gap:5px;padding:6px;background:#0a0a0a}
-button{height:48px;border-radius:10px;border:2px solid #facc15;font-weight:bold}
-.bm{background:#222;color:#facc15;font-size:18px}
-.bway{background:#22c55e;color:#000;font-size:10px}
-.badd{background:#facc15;color:#000;font-size:11px}
-#combo{height:48px;border-radius:10px;border:2px solid #facc15;background:#fff;color:#000;font-weight:bold;font-size:11px;padding:0 6px;width:100%}
+body{background:#000;color:#fff;font-family:Arial;padding:5px}
+#mapa{width:100%;height:300px;background:#111;border:2px solid yellow;position:relative;overflow:hidden}
+.gondola{position:absolute;background:#1e40af;border:1px solid yellow;color:yellow;font-size:8px;display:flex;align-items:center;justify-content:center}
+.player{position:absolute;width:14px;height:14px;background:yellow;border-radius:50%;border:2px solid #fff;z-index:10;transition:all 0.1s}
+.pin{position:absolute;width:18px;height:18px;background:red;border-radius:50%;color:#fff;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:5}
+.rota{position:absolute;height:3px;background:#0f0;transform-origin:0 0;z-index:2}
+button{width:100%;padding:12px;margin-top:5px;background:#22c55e;border:2px solid yellow;border-radius:8px;font-weight:bold;font-size:14px}
+select{width:100%;padding:10px;margin-top:5px}
+#log{background:#222;color:#0f0;padding:5px;font-size:11px;min-height:40px;margin-top:5px}
 </style>
 </head>
 <body>
-<div id="gps">V55.1 - LISTA INTELIGENTE - 13 GONDOLAS FIX</div>
-<div id="listaView">🛒 Lista vazia - selecione produto e clique + LISTA | 40 itens</div>
-<canvas id="c"></canvas>
-<div class="btns">
-<button class="bm" onclick="mover(-1,0)">←</button>
-<button class="bm" onclick="mover(0,-1)">↑</button>
-<button class="bm" onclick="mover(0,1)">↓</button>
-<button class="bm" onclick="mover(1,0)">→</button>
+<h3 style="color:yellow;text-align:center">V55.3 - LISTA INTELIGENTE - DIV</h3>
+<div id="mapa"></div>
+<div id="log">Carregando...</div>
+
 <select id="combo">
-<option value="24,1">🧃 TANG [1-2]</option>
-<option value="2,2">🍚 ARROZ [25-26]</option>
-<option value="4,2">🫘 FEIJAO [23-24]</option>
-<option value="6,2">🫒 OLEO [21-22]</option>
-<option value="8,2">🍬 ACUCAR [19-20]</option>
-<option value="10,2">☕ CAFE [17-18]</option>
-<option value="12,2">🍝 MACARRAO [15-16]</option>
-<option value="14,2">🍪 BISCOITO [13-14]</option>
-<option value="16,2">🥛 LEITE [11-12]</option>
-<option value="18,2">🧈 MANTEIGA [9-10]</option>
-<option value="20,2">🧀 QUEIJO [7-8]</option>
-<option value="22,2">🥤 REFRI [5-6]</option>
-<option value="24,2">💧 AGUA [3-4]</option>
-<option value="2,5">🍺 CERVEJA [25-26]</option>
-<option value="4,5">🧃 SUCO [23-24]</option>
-<option value="6,5">⚡ ENERGETICO [21-22]</option>
-<option value="8,5">🧼 SABAO PO [19-20]</option>
-<option value="10,5">🧴 DETERGENTE [17-18]</option>
-<option value="12,5">👕 AMACIANTE [15-16]</option>
-<option value="14,5">✨ DESINFETANTE [13-14]</option>
-<option value="16,5">🧻 PAPEL HIG [11-12]</option>
-<option value="18,5">🧼 SABONETE [9-10]</option>
-<option value="20,5">💆 SHAMPOO [7-8]</option>
-<option value="22,5">🪥 CREME DENTAL [5-6]</option>
-<option value="24,5">💨 DESODORANTE [3-4]</option>
-<option value="2,10">🍞 PAO [25-26]</option>
-<option value="4,10">🍰 BOLO [23-24]</option>
-<option value="6,10">🍖 PRESUNTO [21-22]</option>
-<option value="8,10">🧀 MUSSARELA [19-20]</option>
-<option value="10,10">🥩 CARNE [17-18]</option>
-<option value="12,10">🍗 FRANGO [15-16]</option>
-<option value="14,10">🌭 LINGUICA [13-14]</option>
-<option value="16,10">🥚 OVOS [11-12]</option>
-<option value="18,10">🍅 TOMATE [9-10]</option>
-<option value="20,10">🥔 BATATA [7-8]</option>
-<option value="22,10">🧅 CEBOLA [5-6]</option>
-<option value="24,10">🍌 BANANA [3-4]</option>
-<option value="2,12">🍎 MACA [25-26]</option>
-<option value="4,12">🐶 RACAO CAO [23-24]</option>
-<option value="6,12">🐱 RACAO GATO [21-22]</option>
+<option value="10,20">🍚 ARROZ [25-26]</option>
+<option value="150,20">🥛 LEITE [11-12]</option>
+<option value="80,150">🥩 CARNE [17-18]</option>
+<option value="10,150">🍞 PAO [25-26]</option>
+<option value="200,20">💧 AGUA [3-4]</option>
+<option value="200,150">🍌 BANANA [3-4]</option>
 </select>
-<button class="badd" onclick="addLista()">+ LISTA</button>
-</div>
-<div class="btns" style="padding-top:0">
-<button class="bway" onclick="gerarRotaInteligente()" style="grid-column: span 4;">🗺️ GERAR ROTA MAIS RÁPIDA</button>
-<button class="bway" onclick="limparLista()" style="background:#ef4444;color:#fff">LIMPAR</button>
-<button class="bway" onclick="ir(26,15)">ENTRADA</button>
-</div>
+
+<button onclick="add()">+ ADICIONAR NA LISTA</button>
+<button onclick="gerar()" style="background:yellow">🗺️ GERAR ROTA MAIS RÁPIDA</button>
+<button onclick="limpar()" style="background:#333;color:#fff">LIMPAR</button>
+
+<div id="lista" style="background:#111;padding:8px;margin-top:5px;font-size:12px"></div>
+
 <script>
-const COLS=27,ROWS=19,W=40,H=26;
-let lab=[],dot=[],px=26,py=15,tx=26,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-let listaCompras=[];
-let rotaOtimizada=[];
-function addLista(){
+let lista=[];
+let player={x:250,y:260};
+
+function desenharMapa(){
+ let m=document.getElementById('mapa');
+ m.innerHTML='';
+ // 6 gondolas
+ let gonds=[{x:0,y:10,w:80,h:20,t:'25-26'},{x:100,y:10,w:80,h:20,t:'11-12'},{x:200,y:10,w:80,h:20,t:'3-4'},{x:0,y:120,w:80,h:20,t:'25-26'},{x:100,y:120,w:80,h:20,t:'17-18'},{x:200,y:120,w:80,h:20,t:'3-4'}];
+ gonds.forEach(g=>{
+   let d=document.createElement('div');d.className='gondola';
+   d.style.left=g.x+'px';d.style.top=g.y+'px';d.style.width=g.w+'px';d.style.height=g.h+'px';
+   d.innerText=g.t; m.appendChild(d);
+ });
+ // entrada
+ let e=document.createElement('div');e.style.position='absolute';e.style.left='240px';e.style.top='250px';e.style.width='40px';e.style.height='20px';e.style.background='#0f0';e.style.color='#000';e.style.fontSize='8px';e.innerText='ENTRADA';m.appendChild(e);
+
+ // player
+ let p=document.createElement('div');p.className='player';p.id='player';
+ p.style.left=player.x+'px';p.style.top=player.y+'px';m.appendChild(p);
+
+ // pins lista
+ lista.forEach((it,i)=>{
+   let pin=document.createElement('div');pin.className='pin';
+   pin.style.left=it.x+'px';pin.style.top=it.y+'px';
+   pin.innerText=i+1; m.appendChild(pin);
+ });
+ document.getElementById('log').innerText='Mapa OK - '+lista.length+' itens - Player em '+player.x+','+player.y;
+}
+
+function add(){
  let sel=document.getElementById('combo');
- let v=sel.value.split(','); let x=parseInt(v[0]), y=parseInt(v[1]);
+ let v=sel.value.split(','); let x=parseInt(v[0]),y=parseInt(v[1]);
  let txt=sel.options[sel.selectedIndex].text;
- if(listaCompras.find(i=>i.x==x&&i.y==y)){alert("Já na lista!"); return;}
- listaCompras.push({label:txt, x:x, y:y});
- atualizarListaView();
- draw();
+ if(lista.find(l=>l.x==x&&l.y==y)){alert('Já na lista');return;}
+ lista.push({x,y,txt});
+ document.getElementById('lista').innerHTML+= (lista.length)+'. '+txt+'<br>';
+ desenharMapa();
 }
-function limparLista(){listaCompras=[]; rotaOtimizada=[]; cam=[]; rastro=[]; tx=26;ty=15; if(tm){clearInterval(tm);tm=null;} atualizarListaView(); draw();}
-function atualizarListaView(){
- let el=document.getElementById('listaView');
- if(listaCompras.length==0){el.innerHTML="🛒 Lista vazia - selecione produto e clique + LISTA | 40 itens"; return;}
- let html=listaCompras.map((i,idx)=>`<span class="itemLista">${idx+1} ${i.label}</span>`).join('');
- el.innerHTML=html+` <b style="color:#facc15">[${listaCompras.length}]</b>`;
-}
-function distManhattan(ax,ay,bx,by){ return Math.abs(ax-bx)+Math.abs(ay-by); }
-function gerarRotaInteligente(){
- if(listaCompras.length==0){alert("Adicione produtos na lista!"); return;}
- let restantes=[...listaCompras];
- let atual={x:px,y:py};
+
+function limpar(){lista=[];document.getElementById('lista').innerHTML='';desenharMapa();}
+
+function gerar(){
+ if(lista.length==0){alert('Adicione itens');return;}
+ // ordena por distância da entrada
+ let atual={x:250,y:260};
  let ordem=[];
- while(restantes.length){
-   restantes.sort((a,b)=> distManhattan(atual.x,atual.y,a.x,a.y) - distManhattan(atual.x,atual.y,b.x,b.y));
-   let prox=restantes.shift();
+ let resto=[...lista];
+ let caminho=[];
+ while(resto.length){
+   resto.sort((a,b)=>(Math.abs(atual.x-a.x)+Math.abs(atual.y-a.y)) - (Math.abs(atual.x-b.x)+Math.abs(atual.y-b.y)));
+   let prox=resto.shift();
    ordem.push(prox);
    atual=prox;
  }
- rotaOtimizada=ordem;
- let caminhoCompleto=[];
- let pos={x:px,y:py};
- ordem.forEach(dest=>{
-   let trecho=achar(pos.x,pos.y,dest.x,dest.y);
-   caminhoCompleto=caminhoCompleto.concat(trecho);
-   pos={x:dest.x,y:dest.y};
- });
- cam=caminho
+ lista=ordem;
+ document.getElementById('lista').innerHTML='ROTA OTIMIZADA:<br>'+ordem.map((o,i)=> (i+1)+'. '+o.txt).join('<br>');
+ desenharMapa();
+ // animar player
+ let idx=0;
+ let interval=setInterval(()=>{
+   if(idx>=ordem.length){clearInterval(interval);document.getElementById('log').innerText='✅ CHEGOU - ROTA CONCLUÍDA - '+ordem.length+' itens';return;}
+   let dest=ordem[idx];
+   player.x=dest.x; player.y=dest.y;
+   desenharMapa();
+   idx++;
+ },600);
+}
+
+desenharMapa();
+</script>
+</body>
+</html>

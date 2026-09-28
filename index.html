@@ -2,91 +2,68 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>V57.2 FIX</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATACADAO 364 - V54</title>
 <style>
-body{margin:0;background:#000;font-family:Arial;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-#top{background:#facc15;color:#000;padding:8px;text-align:center;font-weight:bold;font-size:12px}
-canvas{flex:1;width:100%;background:#081230;display:block;touch-action:none}
-.bar{background:#111;padding:5px;display:flex;gap:5px;align-items:center;border-top:2px solid #facc15}
-.btns{display:grid;grid-template-columns:48px 48px 48px 48px 1fr 85px;gap:4px;padding:5px;background:#000}
-button{height:48px;border:2px solid #facc15;border-radius:10px;background:#222;color:#facc15;font-weight:bold}
-select{height:48px;border-radius:10px;border:2px solid #facc15;font-weight:bold}
+body{margin:0;background:#000;color:#fff;font-family:Arial}
+#top{background:#facc15;color:#000;text-align:center;padding:8px;font-weight:bold}
+canvas{width:100%;height:70vh;background:#020617;display:block;border:2px solid #facc15}
+.btns{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:6px}
+button{height:50px;border-radius:12px;border:2px solid #facc15;background:#111;color:#facc15;font-size:18px;font-weight:bold}
+select{height:50px;border-radius:12px;width:100%;grid-column:1/5;font-weight:bold}
+#entrada{grid-column:1/5;background:#22c55e;color:#000}
 </style>
 </head>
 <body>
-<div id="top">ATACADAO 364 - V57.2 FIX AZUL</div>
-<canvas id="c"></canvas>
-<div class="bar">
-<span id="pNome" style="font-size:11px;font-weight:bold;min-width:70px">TANG 364</span>
-<button onclick="votar(1)" style="height:32px">⭐</button>
-<button onclick="votar(3)" style="height:32px">⭐⭐⭐</button>
-<button onclick="votar(5)" style="height:32px">⭐⭐⭐⭐⭐</button>
-</div>
+<div id="top">ATACADAO 364 - V54 - BAIAS AZUIS</div>
+<canvas id="c" width="520" height="760"></canvas>
 <div class="btns">
+<select id="combo"></select>
 <button onclick="mover(-1,0)">←</button>
 <button onclick="mover(0,-1)">↑</button>
 <button onclick="mover(0,1)">↓</button>
 <button onclick="mover(1,0)">→</button>
-<select id="combo" onchange="trocarProduto()"></select>
-<button onclick="ir(6,18)" style="background:#22c55e;color:#000">ENTRADA</button>
+<button id="entrada" onclick="ir(6,18)">VOLTAR ENTRADA</button>
 </div>
 <script>
 const COLS=13,ROWS=19;
-let lab=[],px=6,py=18,tx=6,ty=18,cam=[],tm=null,produtoAtual="TANG 364",rastro=[];
+let lab=[],px=6,py=18,tx=6,ty=18,cam=[],tm=null;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-const PRODUTOS=[
-{nome:"TANG 364",x:2,y:2},{nome:"ARROZ 5KG",x:4,y:2},{nome:"FEIJAO",x:6,y:2},{nome:"OLEO",x:8,y:2},
-{nome:"BISCOITO",x:10,y:2},{nome:"REFRI 2L",x:2,y:5},{nome:"LIMPEZA",x:4,y:5},{nome:"HIGIENE",x:6,y:5},
-{nome:"FRIOS",x:8,y:5},{nome:"PADARIA",x:10,y:5},{nome:"CARNES",x:2,y:12},{nome:"FRUTAS",x:4,y:12},
-{nome:"BEBIDAS",x:6,y:12},{nome:"RACAO",x:8,y:12},{nome:"LEITE",x:10,y:12}
+const PROD=[
+{n:"TANG 364",x:2,y:2},{n:"ARROZ",x:4,y:2},{n:"FEIJAO",x:6,y:2},{n:"OLEO",x:8,y:2},{n:"BISCOITO",x:10,y:2},
+{n:"REFRI",x:2,y:5},{n:"LIMPEZA",x:4,y:5},{n:"HIGIENE",x:6,y:5},{n:"FRIOS",x:8,y:5},{n:"PADARIA",x:10,y:5}
 ];
-function init(){
+(function init(){
  let combo=document.getElementById('combo');
- PRODUTOS.forEach(p=>{let o=document.createElement('option');o.value=p.x+","+p.y;o.textContent=p.nome;combo.appendChild(o);});
+ PROD.forEach(p=>{let o=document.createElement('option');o.value=p.x+','+p.y;o.textContent=p.n;combo.appendChild(o);});
  for(let y=0;y<ROWS;y++){lab[y]=[];for(let x=0;x<COLS;x++){
    lab[y][x]=0;
-   if(y>0&&y<18&&y!=9&&x!=0&&x!=12&&x!=6){if(x%2==1&&y%2==1)lab[y][x]=1;}
+   if(y!=0&&y!=18&&y!=9){if(x==1||x==3||x==5||x==7||x==9||x==11) if(y%2==1||y==2||y==5) lab[y][x]=1;}
  }}
  draw();
-}
+})();
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]==0;}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return [];}
 function draw(){
- let W=cv.clientWidth/COLS, H=cv.clientHeight/ROWS;
- ctx.fillStyle='#081230';ctx.fillRect(0,0,cv.width,cv.height);
- let w=cv.width/COLS, h=cv.height/ROWS;
+ let W=cv.width/COLS,H=cv.height/ROWS;
+ ctx.fillStyle='#020617';ctx.fillRect(0,0,cv.width,cv.height);
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
    if(lab[y][x]==1){
-     ctx.fillStyle='#0a194e';ctx.fillRect(x*w,y*h,w,h);
-     ctx.fillStyle='#1e40af';ctx.fillRect(x*w+2,y*h+2,w-4,h-4);
-     ctx.fillStyle='#60a5fa';ctx.fillRect(x*w+2,y*h+2,w-4,4);
+     ctx.fillStyle='#0f2167';ctx.fillRect(x*W,y*H,W,H);
+     ctx.fillStyle='#1e3a8a';ctx.fillRect(x*W+1,y*H+1,W-2,H-2);
+     ctx.fillStyle='#3b82f6';ctx.fillRect(x*W+2,y*H+2,W-6,5);
    }
  }
- // rastro
- rastro.forEach((p,i)=>{let a=(i+1)/rastro.length;ctx.fillStyle='rgba(34,197,94,'+(a)+')';ctx.beginPath();ctx.arc(p.x*w+w/2,p.y*h+h/2,5,0,6.28);ctx.fill();});
- // destino
- if(!(tx==6&&ty==18)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*w-2,ty*h-2,w+4,h+4);}
- // boneco
- ctx.fillStyle='#facc15';ctx.shadowColor='#facc15';ctx.shadowBlur=15;
- ctx.beginPath();ctx.arc(px*w+w/2,py*h+h/2,Math.min(w,h)*0.4,0,6.28);ctx.fill();ctx.shadowBlur=0;
+ // destino vermelho
+ if(!(tx==6&&ty==18)){ctx.fillStyle='red';ctx.fillRect(tx*W,ty*H,W,H);}
+ // boneco amarelo
+ ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+W/2,py*H+H/2,12,0,6.28);ctx.fill();
  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
 }
-function resize(){
- let dpr=window.devicePixelRatio||1;
- let rect=cv.getBoundingClientRect();
- cv.width=rect.width*dpr;cv.height=rect.height*dpr;
- ctx.setTransform(dpr,0,0,dpr,0,0);
- draw();
-}
-window.addEventListener('resize',()=>{resize();draw();});
-function step(){if(cam.length==0){clearInterval(tm);tm=null;return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>10)rastro.shift();px=p.x;py=p.y;draw();}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>10)rastro.shift();px=nx;py=ny;draw();}
-function ir(x,y){if(tm){clearInterval(tm);tm=null;}if(x==6&&y==18)rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){px=x;py=y;draw();return;}tm=setInterval(step,120);}
-function trocarProduto(){let s=document.getElementById('combo');let v=s.value.split(',');produtoAtual=s.options[s.selectedIndex].text;document.getElementById('pNome').innerText=produtoAtual;ir(parseInt(v[0]),parseInt(v[1]));}
-function votar(n){alert('Votou '+n+' em '+produtoAtual);}
-setTimeout(()=>{resize();draw();},100);
-init();
+function step(){if(cam.length==0){clearInterval(tm);tm=null;return;}let p=cam.shift();px=p.x;py=p.y;draw();}
+function mover(dx,dy){let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;draw();}
+function ir(x,y){if(tm)clearInterval(tm);tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){px=x;py=y;draw();return;}tm=setInterval(step,150);}
+document.getElementById('combo').onchange=function(){let v=this.value.split(',');ir(parseInt(v[0]),parseInt(v[1]));}
 </script>
 </body>
 </html>

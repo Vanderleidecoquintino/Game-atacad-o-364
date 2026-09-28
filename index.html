@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>V55 LISTA INTELIGENTE</title>
+<title>V55.1 LISTA INTELIGENTE FIX</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 #gps{background:#facc15;color:#000;padding:6px;text-align:center;font-size:11px;font-weight:bold}
-#listaView{background:#111;padding:6px;max-height:90px;overflow:auto;border-bottom:2px solid #22c55e}
+#listaView{background:#111;padding:6px;max-height:95px;overflow:auto;border-bottom:2px solid #22c55e;font-size:10px}
 .itemLista{display:inline-block;background:#22c55e;color:#000;padding:3px 8px;margin:2px;border-radius:12px;font-size:10px;font-weight:bold}
-canvas{flex:1;width:100%;background:#000;border:3px solid #facc15;touch-action:none;display:block}
+canvas{flex:1;width:100%;background:#000;border:3px solid #facc15;touch-action:none;display:block;min-height:350px}
 .btns{display:grid;grid-template-columns:repeat(4,1fr) 1.5fr 1fr;gap:5px;padding:6px;background:#0a0a0a}
 button{height:48px;border-radius:10px;border:2px solid #facc15;font-weight:bold}
 .bm{background:#222;color:#facc15;font-size:18px}
 .bway{background:#22c55e;color:#000;font-size:10px}
-.badd{background:#facc15;color:#000;font-size:10px}
+.badd{background:#facc15;color:#000;font-size:11px}
 #combo{height:48px;border-radius:10px;border:2px solid #facc15;background:#fff;color:#000;font-weight:bold;font-size:11px;padding:0 6px;width:100%}
 </style>
 </head>
 <body>
-<div id="gps">V55 - LISTA INTELIGENTE - 40 ITENS - ROTA OTIMIZADA</div>
-<div id="listaView">🛒 Lista vazia - adicione produtos | Total: 0m</div>
+<div id="gps">V55.1 - LISTA INTELIGENTE - 13 GONDOLAS FIX</div>
+<div id="listaView">🛒 Lista vazia - selecione produto e clique + LISTA | 40 itens</div>
 <canvas id="c"></canvas>
 <div class="btns">
 <button class="bm" onclick="mover(-1,0)">←</button>
@@ -73,15 +73,50 @@ button{height:48px;border-radius:10px;border:2px solid #facc15;font-weight:bold}
 <button class="badd" onclick="addLista()">+ LISTA</button>
 </div>
 <div class="btns" style="padding-top:0">
-<button class="bway" onclick="gerarRotaInteligente()" style="grid-column: span 4;">🗺️ GERAR ROTA MAIS RÁPIDA (LISTA)</button>
+<button class="bway" onclick="gerarRotaInteligente()" style="grid-column: span 4;">🗺️ GERAR ROTA MAIS RÁPIDA</button>
 <button class="bway" onclick="limparLista()" style="background:#ef4444;color:#fff">LIMPAR</button>
 <button class="bway" onclick="ir(26,15)">ENTRADA</button>
 </div>
 <script>
-// --- SEU CORE V54.8 MANTIDO ---
 const COLS=27,ROWS=19,W=40,H=26;
 let lab=[],dot=[],px=26,py=15,tx=26,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
-let produtoAtual="TANG 364";
-let caixas=[];for(let i=0;i<31;i++) caixas.push({id:i+1,fila:Math.floor(Math.random()*4)});
-let precos={"TANG 364":"R$ 1,49","ARROZ 5KG":"R$ 22,90","FEIJAO 1KG":"R$ 8,99","OLEO 900ML":"R$ 7,49","ACUCAR 1KG":"R$ 4,99","CAFE 500G":"R$ 14,90","MACARRAO":"R$ 3,99","BISCOITO":"R$ 3,49","LEITE 1L":"R$ 4,89","MANTEIGA":"R$ 9,90","QUEIJO":"R$ 29,90","REFRI 2L":"R$ 8,99","AGUA 500ML":"R$ 2,49","CERVEJA":"R$ 3,99","SUCO CAIXA":"R$ 6,99","ENERGETICO":"R$ 7,99","SABAO PO":"R$ 12,90","DETERGENTE":"R$ 2,49","AMACIANTE":"R$ 9,90","DESINFETANTE":"R$ 6,99","PAPEL HIG":"R$ 15,90","SABONETE":"R$ 2,99","SHAMPOO":"R$ 15,90","CREME DENTAL":"R$ 4,99","DESODORANTE":"R$ 12,90","PAO FRANCES":"R$ 0,89","BOLO":"R$ 6,90","PRESUNTO":"R$ 32,90","MUSSARELA":"R$ 39,90","CARNE MOIDA":"R$ 29,90","FRANGO":"R$ 18,90","LINGUICA":"R$ 22,90","OVOS 12UN":"R$ 14,90","TOMATE":"R$ 7,90","BATATA":"R$ 5,90","CEBOLA":"R$ 4,90","BANANA":"R$ 6,90","MACA":"R$ 9,90","RACAO CAO":"R$ 89,90","RACAO GATO":"R$ 79,90"};
-let icons={"TANG 364":"🧃","ARROZ 5KG":"🍚","FEIJAO 1KG":"🫘","OLEO 900ML":"🫒","ACUCAR 1KG":"🍬","CAFE 500G":"☕","MACARRAO":"🍝","BISCOITO":"🍪","LEITE 1L":"🥛","MANTEIGA":"🧈","QUEIJO":"🧀","REFRI 2L":"🥤","AGUA 500ML":"💧","CERVEJA":"🍺","SUCO CAIXA":"🧃","ENERGETICO":"⚡","SABAO PO":"🧼","DETERGENTE":"🧴","AMACIANTE":"👕","DESINFETANTE":"✨","PAPEL HIG":"🧻","SABONETE":"🧼","SHAMPOO":"💆","CREME DENTAL":"🪥","DESODORANTE":"💨","PAO FRANCES":"🍞","BOLO":"🍰","PRESUNTO":"🍖","MUSSARELA":"🧀","CARNE MOIDA":"🥩","FRANGO":"🍗","LINGUICA":"🌭","OVOS 12UN":"🥚","TOMATE":"🍅","BATATA":"🥔","CEBOLA":"🧅","BANANA":"🍌","MACA":"🍎","RACAO CAO":"
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let listaCompras=[];
+let rotaOtimizada=[];
+function addLista(){
+ let sel=document.getElementById('combo');
+ let v=sel.value.split(','); let x=parseInt(v[0]), y=parseInt(v[1]);
+ let txt=sel.options[sel.selectedIndex].text;
+ if(listaCompras.find(i=>i.x==x&&i.y==y)){alert("Já na lista!"); return;}
+ listaCompras.push({label:txt, x:x, y:y});
+ atualizarListaView();
+ draw();
+}
+function limparLista(){listaCompras=[]; rotaOtimizada=[]; cam=[]; rastro=[]; tx=26;ty=15; if(tm){clearInterval(tm);tm=null;} atualizarListaView(); draw();}
+function atualizarListaView(){
+ let el=document.getElementById('listaView');
+ if(listaCompras.length==0){el.innerHTML="🛒 Lista vazia - selecione produto e clique + LISTA | 40 itens"; return;}
+ let html=listaCompras.map((i,idx)=>`<span class="itemLista">${idx+1} ${i.label}</span>`).join('');
+ el.innerHTML=html+` <b style="color:#facc15">[${listaCompras.length}]</b>`;
+}
+function distManhattan(ax,ay,bx,by){ return Math.abs(ax-bx)+Math.abs(ay-by); }
+function gerarRotaInteligente(){
+ if(listaCompras.length==0){alert("Adicione produtos na lista!"); return;}
+ let restantes=[...listaCompras];
+ let atual={x:px,y:py};
+ let ordem=[];
+ while(restantes.length){
+   restantes.sort((a,b)=> distManhattan(atual.x,atual.y,a.x,a.y) - distManhattan(atual.x,atual.y,b.x,b.y));
+   let prox=restantes.shift();
+   ordem.push(prox);
+   atual=prox;
+ }
+ rotaOtimizada=ordem;
+ let caminhoCompleto=[];
+ let pos={x:px,y:py};
+ ordem.forEach(dest=>{
+   let trecho=achar(pos.x,pos.y,dest.x,dest.y);
+   caminhoCompleto=caminhoCompleto.concat(trecho);
+   pos={x:dest.x,y:dest.y};
+ });
+ cam=caminho

@@ -1,35 +1,91 @@
-<div id="ofertaBox" style="display:none;background:#22c55e;color:#000;padding:10px;border-radius:10px;margin:8px">
-  <b>Quer oferta de <span id="prodOferta">TANG</span>?</b><br>
-  <input id="zap" placeholder="Seu zap (opcional)" style="width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none">
-  <button onclick="pedirOferta()" style="background:#000;color:#22c55e;width:100%;padding:10px;border-radius:8px">ME AVISA NA OFERTA 🔔</button>
-  <button onclick="this.parentElement.style.display='none'" style="background:transparent;border:none;font-size:11px;margin-top:5px">agora não, obrigado</button>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>V56.1 COM HELP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+#gps{background:#facc15;color:#000;padding:8px;text-align:center;font-size:11px;font-weight:bold}
+#helpBtn{position:absolute;top:36px;right:10px;z-index:900;background:#facc15;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-weight:bold;font-size:20px;box-shadow:0 0 15px #facc15}
+canvas{flex:1;width:100%;background:#000;border:3px solid #facc15;touch-action:none}
+.btns{display:grid;grid-template-columns:repeat(4,1fr) 1.5fr 1fr;gap:6px;padding:8px;background:#0a0a0a}
+button{height:54px;border-radius:12px;border:2px solid #facc15;font-weight:bold}
+.bm{background:#222;color:#facc15;font-size:20px}
+#combo{height:54px;border-radius:12px;border:2px solid #facc15;background:#fff;color:#000;font-weight:bold;font-size:14px;padding:0 8px;width:100%}
+#votoBox{background:#111;padding:8px;display:flex;gap:6px;align-items:center;border-top:2px solid #facc15}
+#ofertaBox{display:none;background:#22c55e;color:#000;padding:12px;border-radius:12px;margin:8px;position:relative;z-index:800}
+#help{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+</style>
+</head>
+<body>
+<div id="gps">📍 V56.1 - COM HELP</div>
+<button id="helpBtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+
+<div id="help" onclick="this.style.display='none'">
+  <div style="background:#111;border:3px solid #facc15;border-radius:16px;padding:18px;max-width:330px;width:100%" onclick="event.stopPropagation()">
+    <h3 style="color:#facc15;margin-bottom:12px;text-align:center">🛒 COMO USAR</h3>
+    <div style="font-size:13px;line-height:1.8;text-align:left">
+      <p>➡️ <b>Setas:</b> anda pelo mercado</p>
+      <p>📦 <b>Escolha produto:</b> vai sozinho</p>
+      <p>⭐ <b>Vota:</b> 1 a 5 estrelas</p>
+      <p>🔔 <b>Oferta:</b> deixa zap se QUISER</p>
+      <p>🟢 <b>ENTRADA:</b> volta pro início</p>
+      <p>🟡 <b>Pontinhos:</b> são os corredores</p>
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'" style="width:100%;margin-top:14px;background:#facc15;color:#000;border:none;padding:14px;border-radius:10px;font-weight:bold">ENTENDI, BORA! 🚀</button>
+  </div>
+</div>
+
+<canvas id="c"></canvas>
+
+<div id="votoBox">
+  <span id="pNome" style="font-size:11px">TANG 364</span>
+  <button onclick="votar(1)">⭐</button><button onclick="votar(3)">⭐⭐⭐</button><button onclick="votar(5)">⭐⭐⭐⭐⭐</button>
+  <span id="msg" style="font-size:10px;color:#22c55e"></span>
+</div>
+
+<div id="ofertaBox">
+  <b>Quer oferta de <span id="prodOferta"></span>?</b><br>
+  <input id="zap" placeholder="Seu zap (opcional)" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:none">
+  <button onclick="pedirOferta()" style="background:#000;color:#22c55e;width:100%;padding:12px;border-radius:8px;border:2px solid #000">ME AVISA 🔔</button>
+  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;font-size:11px;margin-top:6px;width:100%">agora não</button>
+</div>
+
+<div class="btns">
+<button class="bm" onclick="mover(-1,0)">←</button>
+<button class="bm" onclick="mover(0,-1)">↑</button>
+<button class="bm" onclick="mover(0,1)">↓</button>
+<button class="bm" onclick="mover(1,0)">→</button>
+<select id="combo" onchange="trocarProduto()"></select>
+<button class="bm" onclick="ir(12,15)" style="background:#22c55e;color:#000">ENTRADA</button>
 </div>
 
 <script>
-async function votar(nota){
-  // ... seu código de voto que já tem ...
-  let r = await fetch('api.php?action=votar',{...});
-  let j = await r.json();
-  document.getElementById('msg').innerText = j.msg;
-
-  // SÓ SE VOTOU COM SUCESSO, mostra oferta opcional
-  if(j.ok){
-    document.getElementById('prodOferta').innerText = produto;
-    document.getElementById('ofertaBox').style.display='block';
-  }
+let COLS=13,ROWS=19,W=40,H=26,lab=[],dot=[],px=12,py=15,tx=12,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0,produtoAtual="TANG 364";
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let meuUUID=localStorage.getItem('app_uuid')||crypto.randomUUID();localStorage.setItem('app_uuid',meuUUID);
+const IMGS={};
+async function carregarMatrix(){
+  try{let r=await fetch('api.php?action=matrix');let d=await r.json();lab=d.lab;COLS=d.cols;ROWS=d.rows;let combo=document.getElementById('combo');combo.innerHTML='';d.produtos.forEach(p=>{let o=document.createElement('option');o.value=`${p.x},${p.y}`;o.textContent=p.nome;combo.appendChild(o);let im=new Image();im.src=p.foto;IMGS[p.nome]=im;});}catch(e){let prods=["TANG 364","ARROZ","FEIJÃO","ÓLEO","BISCOITO","REFRI","LIMPEZA","HIGIENE","FRIOS","PADARIA","CARNES","FRUTAS","BEBIDAS","RAÇÃO"];let combo=document.getElementById('combo');prods.forEach((n,i)=>{let o=document.createElement('option');o.value=`${2+i*2},2`;o.textContent=n;combo.appendChild(o);});}
+  initLab();
 }
-
-async function pedirOferta(){
-  let zap = document.getElementById('zap').value;
-  if(!zap) return alert('coloca seu zap');
-  let produto = document.getElementById('combo').options[document.getElementById('combo').selectedIndex].text;
-  let res = await fetch('api.php?action=oferta',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({uuid:meuUUID, produto, zap})
-  });
-  let data = await res.json();
-  alert(data.msg);
-  document.getElementById('ofertaBox').style.display='none';
-}
+function initLab(){if(lab.length==0){for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){if(y==0||y==8||y==17||x==0||x==12)lab[y][x]=0;else if(x%2==1)lab[y][x]=1;else lab[y][x]=0;dot[y][x]=lab[y][x]==0;}}}else{for(let y=0;y<ROWS;y++){dot[y]=[];for(let x=0;x<COLS;x++)dot[y][x]=lab[y][x]==0;}} resize();draw();}
+function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
+function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return []}
+function resize(){vw=cv.clientWidth;vh=cv.clientHeight;let dpr=devicePixelRatio||1;cv.width=vw*dpr;cv.height=vh*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}
+window.addEventListener('resize',resize);
+function updateCam(){let tX=px*W-vw/2+W/2,tY=py*H-vh/2+H/2;camX+=(tX-camX)*0.15;camY+=(tY-camY)*0.15;camX=Math.max(0,Math.min(camX,COLS*W-vw));camY=Math.max(0,Math.min(camY,ROWS*H-vh));}
+function draw(){updateCam();ctx.fillStyle='#000';ctx.fillRect(0,0,vw,vh);ctx.save();ctx.translate(-camX,-camY);for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){if(lab[y][x]==1){ctx.fillStyle='#1e40af';ctx.fillRect(x*W,y*H,W,H);}else if(dot[y]&&dot[y][x]){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+20,y*H+13,2.5,0,6.28);ctx.fill();}}for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle=`rgba(34,197,94,${0.4+a*0.6})`;ctx.beginPath();ctx.arc(p.x*W+20,p.y*H+13,6*a+2,0,6.28);ctx.fill();}if(!(tx==12&&ty==15)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}if(px==tx&&py==ty&&!(tx==12&&ty==15)){let bx=tx*W,by=ty*H,flagY=by+28,fx=bx-30;if(fx<camX)fx=camX+4;if(fx+130>camX+vw)fx=camX+vw-134;ctx.fillStyle='#facc15';ctx.fillRect(bx+18,by+22,4,60);ctx.fillStyle='#fff';ctx.fillRect(fx,flagY,130,56);ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.strokeRect(fx,flagY,130,56);ctx.fillStyle='#000';ctx.font='bold 10px Arial';ctx.fillText(produtoAtual,fx+6,flagY+16);try{let foto=IMGS[produtoAtual];if(foto&&foto.complete&&foto.naturalWidth>0)ctx.drawImage(foto,fx+78,flagY+4,48);}catch(e){}}ctx.fillStyle='#facc15';ctx.shadowColor='#facc15';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(px*W+20,py*H+13,11,0,6.28);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.restore();}
+function step(){if(cam.length==0){clearInterval(tm);tm=null;draw();return;}let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>25)rastro.shift();px=p.x;py=p.y;if(dot[py])dot[py][px]=false;draw();}
+function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>25)rastro.shift();px=nx;py=ny;if(dot[py])dot[py][px]=false;draw();}
+function ir(x,y){if(tm){clearInterval(tm);tm=null;}if(x==12&&y==15)rastro=[];tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){rastro.push({x:px,y:py});px=x;py=y;draw();return;}tm=setInterval(step,120);draw();}
+function trocarProduto(){let sel=document.getElementById('combo');let v=sel.value.split(',');produtoAtual=sel.options[sel.selectedIndex].text;document.getElementById('pNome').innerText=produtoAtual;ir(parseInt(v[0]),parseInt(v[1]));}
+async function votar(nota){let produto=produtoAtual;try{let r=await fetch('api.php?action=votar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:meuUUID,produto,nota})});let j=await r.json();document.getElementById('msg').innerText=j.msg;if(j.ok){document.getElementById('prodOferta').innerText=produto;document.getElementById('ofertaBox').style.display='block';}}catch(e){document.getElementById('msg').innerText=`votou ⭐${nota}`;document.getElementById('prodOferta').innerText=produto;document.getElementById('ofertaBox').style.display='block';}}
+async function pedirOferta(){let zap=document.getElementById('zap').value;if(!zap)return alert('coloca seu zap');try{let r=await fetch('api.php?action=oferta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:meuUUID,produto:produtoAtual,zap})});let j=await r.json();alert(j.msg);}catch(e){alert('zap salvo!')}document.getElementById('ofertaBox').style.display='none';}
+function loop(){updateCam();draw();requestAnimationFrame(loop);}
+carregarMatrix();loop();
 </script>
+</body>
+</html>

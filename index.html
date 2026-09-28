@@ -2,110 +2,155 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>V55.3 DIV - SEMPRE FUNCIONA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>V55.5 GONDOLA TAMANHO REAL</title>
 <style>
-body{background:#000;color:#fff;font-family:Arial;padding:5px}
-#mapa{width:100%;height:300px;background:#111;border:2px solid yellow;position:relative;overflow:hidden}
-.gondola{position:absolute;background:#1e40af;border:1px solid yellow;color:yellow;font-size:8px;display:flex;align-items:center;justify-content:center}
-.player{position:absolute;width:14px;height:14px;background:yellow;border-radius:50%;border:2px solid #fff;z-index:10;transition:all 0.1s}
-.pin{position:absolute;width:18px;height:18px;background:red;border-radius:50%;color:#fff;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:5}
-.rota{position:absolute;height:3px;background:#0f0;transform-origin:0 0;z-index:2}
-button{width:100%;padding:12px;margin-top:5px;background:#22c55e;border:2px solid yellow;border-radius:8px;font-weight:bold;font-size:14px}
-select{width:100%;padding:10px;margin-top:5px}
-#log{background:#222;color:#0f0;padding:5px;font-size:11px;min-height:40px;margin-top:5px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+#top{background:#facc15;color:#000;padding:3px;text-align:center;font-size:9px;font-weight:bold}
+#bar{font-size:8px;background:#111;color:#22c55e;padding:3px;white-space:nowrap;overflow-x:auto;min-height:18px;border-bottom:1px solid #facc15}
+canvas{flex:1;width:100%;background:#000;border:2px solid #facc15;display:block}
+.btns{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:3px;background:#0a0a0a}
+button{height:30px;border-radius:6px;border:1px solid #facc15;font-weight:bold;font-size:9px}
+.bm{background:#222;color:#facc15;font-size:12px}
+.bgo{background:#22c55e;color:#000}
+.badd{background:#facc15;color:#000}
+#combo{grid-column:span 2;height:30px;border-radius:6px;border:1px solid #facc15;background:#fff;color:#000;font-size:9px;font-weight:bold}
 </style>
 </head>
 <body>
-<h3 style="color:yellow;text-align:center">V55.3 - LISTA INTELIGENTE - DIV</h3>
-<div id="mapa"></div>
-<div id="log">Carregando...</div>
-
+<div id="top">V55.5 - 13 GONDOLAS ALTAS REAIS - BOTAO PEQUENO</div>
+<div id="bar">🛒 0 itens</div>
+<canvas id="c"></canvas>
+<div class="btns">
+<button class="bm" onclick="mover(-1,0)">←</button>
+<button class="bm" onclick="mover(0,-1)">↑</button>
+<button class="bm" onclick="mover(0,1)">↓</button>
+<button class="bm" onclick="mover(1,0)">→</button>
 <select id="combo">
-<option value="10,20">🍚 ARROZ [25-26]</option>
-<option value="150,20">🥛 LEITE [11-12]</option>
-<option value="80,150">🥩 CARNE [17-18]</option>
-<option value="10,150">🍞 PAO [25-26]</option>
-<option value="200,20">💧 AGUA [3-4]</option>
-<option value="200,150">🍌 BANANA [3-4]</option>
+<option value="2,2">🍚 ARROZ [25-26]</option>
+<option value="4,2">🫘 FEIJAO [23-24]</option>
+<option value="6,2">🫒 OLEO [21-22]</option>
+<option value="8,2">🍬 ACUCAR [19-20]</option>
+<option value="10,2">☕ CAFE [17-18]</option>
+<option value="12,2">🍝 MACARRAO [15-16]</option>
+<option value="14,2">🍪 BISCOITO [13-14]</option>
+<option value="16,2">🥛 LEITE [11-12]</option>
+<option value="18,2">🧈 MANTEIGA [9-10]</option>
+<option value="20,2">🧀 QUEIJO [7-8]</option>
+<option value="22,2">🥤 REFRI [5-6]</option>
+<option value="24,2">💧 AGUA [3-4]</option>
+<option value="2,5">🍺 CERVEJA</option>
+<option value="10,10">🥩 CARNE</option>
+<option value="2,10">🍞 PAO</option>
+<option value="24,10">🍌 BANANA</option>
 </select>
-
-<button onclick="add()">+ ADICIONAR NA LISTA</button>
-<button onclick="gerar()" style="background:yellow">🗺️ GERAR ROTA MAIS RÁPIDA</button>
-<button onclick="limpar()" style="background:#333;color:#fff">LIMPAR</button>
-
-<div id="lista" style="background:#111;padding:8px;margin-top:5px;font-size:12px"></div>
-
+<button class="badd" onclick="add()">+LISTA</button>
+</div>
+<div class="btns" style="padding-top:1px">
+<button class="bm" onclick="ir(26,15)" style="background:#22c55e;color:#000">ENTRADA</button>
+<button class="bgo" onclick="gerar()" style="grid-column:span 3">🗺️ ROTA RÁPIDA</button>
+<button class="bm" onclick="limpar()" style="background:#ef4444;color:#fff">X</button>
+<button class="bm" onclick="mover(0,-3)">↑↑</button>
+</div>
 <script>
-let lista=[];
-let player={x:250,y:260};
+const COLS=27,ROWS=19,W=40,H=26; // MESMO DA V54.8
+let lab=[],px=26,py=15,cam=[],tm=null,lista=[];
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 
-function desenharMapa(){
- let m=document.getElementById('mapa');
- m.innerHTML='';
- // 6 gondolas
- let gonds=[{x:0,y:10,w:80,h:20,t:'25-26'},{x:100,y:10,w:80,h:20,t:'11-12'},{x:200,y:10,w:80,h:20,t:'3-4'},{x:0,y:120,w:80,h:20,t:'25-26'},{x:100,y:120,w:80,h:20,t:'17-18'},{x:200,y:120,w:80,h:20,t:'3-4'}];
- gonds.forEach(g=>{
-   let d=document.createElement('div');d.className='gondola';
-   d.style.left=g.x+'px';d.style.top=g.y+'px';d.style.width=g.w+'px';d.style.height=g.h+'px';
-   d.innerText=g.t; m.appendChild(d);
- });
- // entrada
- let e=document.createElement('div');e.style.position='absolute';e.style.left='240px';e.style.top='250px';e.style.width='40px';e.style.height='20px';e.style.background='#0f0';e.style.color='#000';e.style.fontSize='8px';e.innerText='ENTRADA';m.appendChild(e);
-
- // player
- let p=document.createElement('div');p.className='player';p.id='player';
- p.style.left=player.x+'px';p.style.top=player.y+'px';m.appendChild(p);
-
- // pins lista
- lista.forEach((it,i)=>{
-   let pin=document.createElement('div');pin.className='pin';
-   pin.style.left=it.x+'px';pin.style.top=it.y+'px';
-   pin.innerText=i+1; m.appendChild(pin);
- });
- document.getElementById('log').innerText='Mapa OK - '+lista.length+' itens - Player em '+player.x+','+player.y;
-}
-
-function add(){
- let sel=document.getElementById('combo');
- let v=sel.value.split(','); let x=parseInt(v[0]),y=parseInt(v[1]);
- let txt=sel.options[sel.selectedIndex].text;
- if(lista.find(l=>l.x==x&&l.y==y)){alert('Já na lista');return;}
- lista.push({x,y,txt});
- document.getElementById('lista').innerHTML+= (lista.length)+'. '+txt+'<br>';
- desenharMapa();
-}
-
-function limpar(){lista=[];document.getElementById('lista').innerHTML='';desenharMapa();}
-
-function gerar(){
- if(lista.length==0){alert('Adicione itens');return;}
- // ordena por distância da entrada
- let atual={x:250,y:260};
- let ordem=[];
- let resto=[...lista];
- let caminho=[];
- while(resto.length){
-   resto.sort((a,b)=>(Math.abs(atual.x-a.x)+Math.abs(atual.y-a.y)) - (Math.abs(atual.x-b.x)+Math.abs(atual.y-b.y)));
-   let prox=resto.shift();
-   ordem.push(prox);
-   atual=prox;
+function init(){
+ lab=[];
+ for(let y=0;y<ROWS;y++){
+   lab[y]=[];
+   for(let x=0;x<COLS;x++){
+     // IGUAL V54.8 ORIGINAL
+     if(y==0||y==8||y==17||x==0||x==COLS-1) lab[y][x]=0; // corredor
+     else if(x%2==1) lab[y][x]=1; // GONDOLA ALTA VERTICAL
+     else lab[y][x]=0; // corredor entre gondolas
+   }
  }
- lista=ordem;
- document.getElementById('lista').innerHTML='ROTA OTIMIZADA:<br>'+ordem.map((o,i)=> (i+1)+'. '+o.txt).join('<br>');
- desenharMapa();
- // animar player
- let idx=0;
- let interval=setInterval(()=>{
-   if(idx>=ordem.length){clearInterval(interval);document.getElementById('log').innerText='✅ CHEGOU - ROTA CONCLUÍDA - '+ordem.length+' itens';return;}
-   let dest=ordem[idx];
-   player.x=dest.x; player.y=dest.y;
-   desenharMapa();
-   idx++;
- },600);
 }
-
-desenharMapa();
+function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
+function achar(sx,sy,ex,ey){
+ let q=[{x:sx,y:sy,p:[]}],v={};v[sx+','+sy]=1;
+ while(q.length){
+   let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;
+   for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){
+     let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;
+     if(!v[k]&&livre(nx,ny)){v[k]=1;q.push({x:nx,y:ny,p:c.p.concat([{x:nx,y:ny}])})}
+   }
+ }return [];
+}
+function resize(){
+ let r=cv.getBoundingClientRect();
+ cv.width=r.width; cv.height=r.height;
+ draw();
+}
+function draw(){
+ ctx.fillStyle='#000';ctx.fillRect(0,0,cv.width,cv.height);
+ // CAMERA SIMPLES - SEM BUG
+ let camX=px*W - cv.width/2 + W/2;
+ let camY=py*H - cv.height/2 + H/2;
+ ctx.save();ctx.translate(-camX,-camY);
+ // GONDOLAS ALTAS - TAMANHO REAL V54.8
+ for(let y=0;y<ROWS;y++){
+  for(let x=0;x<COLS;x++){
+   if(lab[y][x]==1){
+     ctx.fillStyle='#0a194e';ctx.fillRect(x*W,y*H,W,H);
+     ctx.fillStyle='#1e40af';ctx.fillRect(x*W+2,y*H+2,W-4,H-4);
+     if(y==1||y==9){
+       ctx.fillStyle='#facc15';ctx.font='bold 9px Arial';ctx.textAlign='center';
+       let n='';if(x==25)n='1-2';else if(x==23)n='3-4';else if(x==21)n='5-6';else if(x==19)n='7-8';else if(x==17)n='9-10';else if(x==15)n='11-12';else if(x==13)n='13-14';else if(x==11)n='15-16';else if(x==9)n='17-18';else if(x==7)n='19-20';else if(x==5)n='21-22';else if(x==3)n='23-24';else if(x==1)n='25-26';
+       ctx.fillText(n,x*W+W/2,y*H+12);
+     }
+   }else{
+     // bolinha do chão
+     if(y!=0&&y!=8&&y!=17){ctx.fillStyle='#222';ctx.beginPath();ctx.arc(x*W+W/2,y*H+H/2,1.5,0,6.28);ctx.fill();}
+   }
+  }
+ }
+ // ENTRADA VERDE GRANDE
+ ctx.fillStyle='#22c55e';ctx.fillRect(26*W,15*H,W,H);ctx.fillStyle='#000';ctx.font='bold 8px Arial';ctx.fillText('ENTRADA',26*W+1,15*H+16);
+ // ROTA VERDE
+ if(cam.length>1){
+   ctx.strokeStyle='#22c55e';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(px*W+W/2,py*H+H/2);
+   for(let p of cam) ctx.lineTo(p.x*W+W/2,p.y*H+H/2);
+   ctx.stroke();
+ }
+ // PINS DA LISTA
+ lista.forEach((it,i)=>{
+   ctx.fillStyle=it.visitado?'#22c55e':'#ef4444';
+   ctx.beginPath();ctx.arc(it.x*W+W/2,it.y*H+H/2,11,0,6.28);ctx.fill();
+   ctx.fillStyle='#fff';ctx.font='bold 10px Arial';ctx.textAlign='center';ctx.fillText(i+1,it.x*W+W/2,it.y*H+H/2+3);
+ });
+ // PLAYER AMARELO
+ ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+W/2,py*H+H/2,10,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+ ctx.restore();
+}
+function step(){if(!cam.length){clearInterval(tm);tm=null;return;}let p=cam.shift();px=p.x;py=p.y;draw();}
+function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;px=nx;py=ny;draw();}
+function ir(x,y){if(lab[y][x]==1){if(x>0&&lab[y][x-1]!=1)x--;else x++;}let c=achar(px,py,x,y);cam=c;if(tm)clearInterval(tm);tm=setInterval(step,80);draw();}
+function add(){
+ let v=document.getElementById('combo').value.split(',');let x=+v[0],y=+v[1];let txt=document.getElementById('combo').options[document.getElementById('combo').selectedIndex].text;
+ if(lista.find(i=>i.x==x&&i.y==y))return;
+ lista.push({x,y,txt,visitado:false});
+ document.getElementById('bar').innerHTML=lista.map((l,i)=>`${i+1}.${l.txt}`).join(' | ')+` [${lista.length}]`;
+ draw();
+}
+function limpar(){lista=[];cam=[];if(tm)clearInterval(tm);document.getElementById('bar').innerHTML='🛒 0 itens';draw();}
+function gerar(){
+ if(!lista.length)return;
+ let rest=[...lista],atual={x:px,y:py},ordem=[],total=[];
+ while(rest.length){
+   rest.sort((a,b)=> (Math.abs(atual.x-a.x)+Math.abs(atual.y-a.y)) - (Math.abs(atual.x-b.x)+Math.abs(atual.y-b.y)) );
+   let prox=rest.shift();ordem.push(prox);let tr=achar(atual.x,atual.y,prox.x,prox.y);total=total.concat(tr);atual=prox;
+ }
+ lista=ordem;cam=total;
+ document.getElementById('bar').innerHTML='✅ '+ordem.map(o=>o.txt).join(' → ')+' | '+total.length+' passos';
+ if(tm)clearInterval(tm);tm=setInterval(step,80);
+}
+window.addEventListener('resize',resize);
+init();resize();draw();
 </script>
 </body>
 </html>

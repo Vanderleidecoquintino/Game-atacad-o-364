@@ -3,84 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>ATACADÃO 364 - V57</title>
+<title>ATACADAO 364 V57.1</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;color:#fff;font-family:Arial;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-#gps{background:#facc15;color:#000;padding:8px;text-align:center;font-size:12px;font-weight:bold;letter-spacing:1px}
-#helpBtn{position:absolute;top:36px;right:10px;z-index:900;background:#facc15;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-weight:bold;font-size:20px;box-shadow:0 0 10px #facc15}
-canvas{flex:1;width:100%;background:#050a1e;border:3px solid #facc15;touch-action:none}
-.btns{display:grid;grid-template-columns:repeat(4,50px) 1fr 90px;gap:5px;padding:6px;background:#0a0a0a;align-items:center}
-button{height:48px;border-radius:10px;border:2px solid #facc15;font-weight:bold}
-.bm{background:#1a1a1a;color:#facc15;font-size:18px}
-#combo{height:48px;border-radius:10px;border:2px solid #facc15;background:#fff;color:#000;font-weight:bold;font-size:13px;padding:0 6px;width:100%}
+html,body{height:100%;margin:0;background:#000}
+body{display:flex;flex-direction:column;font-family:Arial;color:#fff;overflow:hidden}
+#gps{background:#facc15;color:#000;padding:8px;text-align:center;font-size:12px;font-weight:bold}
+#helpBtn{position:absolute;top:36px;right:10px;z-index:900;background:#facc15;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-weight:bold;font-size:20px}
+#gameWrap{flex:1;position:relative;display:flex}
+canvas{width:100%;height:100%;background:#0a1530;display:block;border:3px solid #facc15;touch-action:none}
+.btns{display:grid;grid-template-columns:repeat(4,48px) 1fr 85px;gap:4px;padding:6px;background:#0a0a0a}
+button{height:46px;border-radius:10px;border:2px solid #facc15;font-weight:bold;background:#1a1a1a;color:#facc15}
+#combo{height:46px;border-radius:10px;border:2px solid #facc15;background:#fff;color:#000;font-weight:bold;font-size:12px;width:100%}
 #votoBox{background:#111;padding:6px 8px;display:flex;gap:6px;align-items:center;border-top:2px solid #facc15}
-#ofertaBox{display:none;background:#22c55e;color:#000;padding:12px;border-radius:12px;margin:8px;position:absolute;bottom:75px;left:8px;right:8px;z-index:800}
+#ofertaBox{display:none;background:#22c55e;color:#000;padding:12px;border-radius:12px;position:absolute;bottom:70px;left:8px;right:8px;z-index:800}
 </style>
 </head>
 <body>
-<div id="gps">🛒 ATACADÃO 364 - V57 AZUL</div>
-<button id="helpBtn" onclick="abrirHelp()">?</button>
-
+<div id="gps">ATACADAO 364 - V57.1 AZUL</div>
+<button id="helpBtn" onclick="document.getElementById('help').style.display='flex'">?</button>
 <div id="help" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#111;border:3px solid #facc15;border-radius:16px;padding:18px;max-width:330px;width:100%">
-    <h3 style="color:#facc15;margin-bottom:12px;text-align:center">🛒 V57</h3>
-    <div style="font-size:13px;line-height:1.8"><p>Motor V56.2 + Tela V54 azul</p></div>
-    <button onclick="fecharHelp()" style="width:100%;margin-top:14px;background:#facc15;color:#000;border:none;padding:14px;border-radius:10px;font-weight:bold">BORA! 🚀</button>
-  </div>
+<div style="background:#111;border:3px solid #facc15;border-radius:16px;padding:18px;max-width:330px;width:100%"><h3 style="color:#facc15;text-align:center">V57.1</h3><p style="font-size:12px;margin-top:10px">Motor V56.2 + Baias Azuis V54</p><button onclick="document.getElementById('help').style.display='none'" style="width:100%;margin-top:14px;background:#facc15;color:#000;border:none;padding:14px;border-radius:10px;font-weight:bold">BORA</button></div>
 </div>
 
-<canvas id="c"></canvas>
+<div id="gameWrap"><canvas id="c"></canvas></div>
 
 <div id="votoBox">
-  <span id="pNome" style="font-size:11px;font-weight:bold;min-width:70px">TANG 364</span>
-  <button onclick="votar(1)" style="height:32px;padding:0 8px">⭐</button>
-  <button onclick="votar(3)" style="height:32px;padding:0 8px">⭐⭐⭐</button>
-  <button onclick="votar(5)" style="height:32px;padding:0 8px">⭐⭐⭐⭐⭐</button>
-  <span id="msg" style="font-size:10px;color:#22c55e"></span>
+<span id="pNome" style="font-size:11px;font-weight:bold;min-width:65px">TANG 364</span>
+<button onclick="votar(1)" style="height:30px">⭐</button>
+<button onclick="votar(3)" style="height:30px">⭐⭐⭐</button>
+<button onclick="votar(5)" style="height:30px">⭐⭐⭐⭐⭐</button>
+<span id="msg" style="font-size:10px;color:#22c55e"></span>
 </div>
 
 <div id="ofertaBox">
-  <b>Oferta <span id="prodOferta"></span>?</b><br>
-  <input id="zap" placeholder="Seu zap" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:none">
-  <button onclick="pedirOferta()" style="background:#000;color:#22c55e;width:100%;padding:12px;border-radius:8px;border:none;font-weight:bold">ME AVISA 🔔</button>
-  <button onclick="document.getElementById('ofertaBox').style.display='none'" style="background:none;border:none;font-size:11px;margin-top:6px;width:100%">agora não</button>
+<b>Oferta <span id="prodOferta"></span>?</b><br>
+<input id="zap" placeholder="Seu zap" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:none">
+<button onclick="pedirOferta()" style="background:#000;color:#22c55e;width:100%;padding:12px;border-radius:8px">ME AVISA</button>
 </div>
 
 <div class="btns">
-<button class="bm" onclick="mover(-1,0)">←</button>
-<button class="bm" onclick="mover(0,-1)">↑</button>
-<button class="bm" onclick="mover(0,1)">↓</button>
-<button class="bm" onclick="mover(1,0)">→</button>
+<button onclick="mover(-1,0)">←</button>
+<button onclick="mover(0,-1)">↑</button>
+<button onclick="mover(0,1)">↓</button>
+<button onclick="mover(1,0)">→</button>
 <select id="combo" onchange="trocarProduto()"></select>
-<button class="bm" onclick="ir(6,18)" style="background:#22c55e;color:#000;border-color:#22c55e">ENTRADA</button>
+<button onclick="ir(6,18)" style="background:#22c55e;color:#000">ENTRADA</button>
 </div>
 
 <script>
-function abrirHelp(){document.getElementById('help').style.display='flex';}
-function fecharHelp(){document.getElementById('help').style.display='none';}
 const COLS=13,ROWS=19,W=40,H=26;
-let lab=[],dot=[],px=6,py=18,tx=6,ty=18,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0,produtoAtual="TANG 364";
+let lab=[],dot=[],px=6,py=18,tx=6,ty=18,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=360,vh=400,produtoAtual="TANG 364";
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 const PRODUTOS=[
- {nome:"TANG 364",x:2,y:2},{nome:"ARROZ 5KG",x:4,y:2},{nome:"FEIJÃO",x:6,y:2},{nome:"ÓLEO",x:8,y:2},
- {nome:"BISCOITO",x:10,y:2},{nome:"REFRI 2L",x:2,y:5},{nome:"LIMPEZA",x:4,y:5},{nome:"HIGIENE",x:6,y:5},
- {nome:"FRIOS",x:8,y:5},{nome:"PADARIA",x:10,y:5},{nome:"CARNES",x:2,y:12},{nome:"FRUTAS",x:4,y:12},
- {nome:"BEBIDAS",x:6,y:12},{nome:"RAÇÃO",x:8,y:12},{nome:"LEITE",x:10,y:12}
+{nome:"TANG 364",x:2,y:2},{nome:"ARROZ 5KG",x:4,y:2},{nome:"FEIJAO",x:6,y:2},{nome:"OLEO",x:8,y:2},
+{nome:"BISCOITO",x:10,y:2},{nome:"REFRI 2L",x:2,y:5},{nome:"LIMPEZA",x:4,y:5},{nome:"HIGIENE",x:6,y:5},
+{nome:"FRIOS",x:8,y:5},{nome:"PADARIA",x:10,y:5},{nome:"CARNES",x:2,y:12},{nome:"FRUTAS",x:4,y:12},
+{nome:"BEBIDAS",x:6,y:12},{nome:"RACAO",x:8,y:12},{nome:"LEITE",x:10,y:12}
 ];
 function init(){
- let combo=document.getElementById('combo');
- combo.innerHTML='';
- PRODUTOS.forEach(p=>{let o=document.createElement('option');o.value=p.x+","+p.y;o.textContent=p.nome;combo.appendChild(o);});
- for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){
-   lab[y][x]=0;
-   if(y!=0&&y!=18&&y!=9&&x!=0&&x!=12&&x!=6){if(x%2==1&&y%2==1)lab[y][x]=1;}
-   dot[y][x]=lab[y][x]==0;
- }}
- resize(); draw(); loop();
+let combo=document.getElementById('combo');combo.innerHTML='';
+PRODUTOS.forEach(p=>{let o=document.createElement('option');o.value=p.x+","+p.y;o.textContent=p.nome;combo.appendChild(o);});
+for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){
+lab[y][x]=0;
+if(y!=0&&y!=18&&y!=9&&x!=0&&x!=12&&x!=6){if(x%2==1&&y%2==1)lab[y][x]=1;}
+dot[y][x]=lab[y][x]==0;
+}}
+resize();loop();
 }
 function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]==0;}
 function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v=new Set([sx+','+sy]);while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v.has(k)&&livre(nx,ny)){v.add(k);q.push({x:nx,y:ny,p:[...c.p,{x:nx,y:ny}]})}}}return [];}
-function resize(){vw=cv.clientWidth;vh=cv.clientHeight;let dpr=window.devicePixelRatio||1;cv.width=vw*dpr;cv.height=vh*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}
+function resize(){
+let rect=cv.parentElement.getBoundingClientRect();
+vw=rect.width; vh=rect.height;
+if(vh<300) vh=window.innerHeight*0.6;
+let dpr=window.devicePixelRatio||1;
+cv.width=vw*dpr; cv.height=vh*dpr;
+ctx.setTransform(dpr,0,0,dpr,0,0);
+}
 window.addEventListener('resize',resize);
-function updateCam(){let tX=px*W-vw/2+W/2,tY=py*H-vh/2+H/2;camX+=(tX-camX)*0.15;camY+=(tY-camY)*0.15;camX=Math.max
+function updateCam(){let tX=px*W-vw/2+W/2,tY=py*H-vh/2+H/2;camX+=(tX-camX)*0.15;camY+=(tY-camY)*0.15;camX=Math.max(0,Math.min(camX,COLS*W-vw));camY=Math.max(0,Math.min(camY,ROWS*H-vh));}
+function draw(){
+updateCam();
+ctx.fillStyle='#0a1530';ctx.fillRect(0,0,vw,vh);
+ctx.save();ctx.translate(-camX,-camY);
+for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+if(lab[y][x]==1){
+ctx.fillStyle='#0a194e';ctx.fillRect(x*W,y*H,W,H);
+ctx.fillStyle='#1e3a8a';ctx.fillRect(x*W+1,y*H+1,W-2,H-2);
+ctx.fillStyle='#3b82f6';ctx.fillRect

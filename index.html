@@ -3,42 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Atacadão 364 - V55.4 LITE</title>
+<title>ATACADÃO 364 - V55.4 OFICIAL</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Arial;overflow:hidden;touch-action:none}
-#game{width:100vw;height:100vh;position:relative;background:linear-gradient(#1a2a4a,#000)}
-#hud{position:absolute;top:0;left:0;width:100%;padding:10px;display:flex;justify-content:space-between;z-index:10;font-weight:bold}
-#player{position:absolute;width:50px;height:50px;background:#ffcc00;border-radius:10px;left:50%;bottom:100px;transform:translateX(-50%)}
-.btn{position:absolute;bottom:20px;width:70px;height:70px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;z-index:10}
-#left{left:20px} #right{right:20px} #action{left:50%;transform:translateX(-50%);background:#ffcc00}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#000;overflow:hidden;font-family:Arial Black,Arial;color:#fff;touch-action:none}
+canvas{display:block;width:100vw;height:100vh}
+#hud{position:absolute;top:0;left:0;width:100%;padding:12px 15px;display:flex;justify-content:space-between;pointer-events:none;z-index:5;font-size:16px;text-shadow:2px 2px 0 #000}
+#controls{position:absolute;bottom:0;left:0;width:100%;height:140px;z-index:5;display:flex;justify-content:space-between;align-items:flex-end;padding:15px}
+.ctrl{width:75px;height:75px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;user-select:none}
+#shoot{width:85px;height:85px;background:#ffcc00;border-color:#ffcc00;color:#000;font-size:40px;position:absolute;left:50%;transform:translateX(-50%);bottom:15px}
+#startScreen{position:absolute;inset:0;background:linear-gradient(180deg,#102040 0%,#000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;text-align:center;padding:20px}
+#startScreen h1{font-size:42px;color:#ffcc00;line-height:0.9;margin-bottom:10px;text-shadow:4px 4px 0 #000}
+.btnPlay{background:#ffcc00;color:#000;border:none;padding:18px 45px;font-size:22px;font-weight:900;border-radius:12px}
 </style>
 </head>
 <body>
-<div id="game">
-<div id="hud"><span id="score">SCORE: 0</span><span>ATACADÃO 364 - LITE</span></div>
-<div id="player"></div>
-<div class="btn" id="left">◀</div>
-<div class="btn" id="action">●</div>
-<div class="btn" id="right">▶</div>
-</div>
-<script>
-let x = window.innerWidth/2, score=0;
-const player=document.getElementById('player');
-let movingLeft=false, movingRight=false;
-function loop(){
- if(movingLeft) x-=6;
- if(movingRight) x+=6;
- x=Math.max(25,Math.min(window.innerWidth-25,x));
- player.style.left=x+'px';
- requestAnimationFrame(loop);
-}
-loop();
-document.getElementById('left').addEventListener('touchstart',()=>movingLeft=true);
-document.getElementById('left').addEventListener('touchend',()=>movingLeft=false);
-document.getElementById('right').addEventListener('touchstart',()=>movingRight=true);
-document.getElementById('right').addEventListener('touchend',()=>movingRight=false);
-setInterval(()=>{score++; document.getElementById('score').innerText='SCORE: '+score;},100);
-</script>
-</body>
-</html>
+<div id="hud"><div id="scoreTxt">SCORE 0</div><div id="lifeTxt">❤️❤️❤️</div></div>
+<canvas id="

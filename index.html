@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>V55.3 PARA E PEGUEI - CORRIGIDO</title>
+<title>V55.4 SEM TELA PRETA</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;overflow:hidden}
@@ -20,7 +20,7 @@ body{background:#000;color:#fff;font-family:Arial;height:100dvh;overflow:hidden}
 #tela2{display:none;height:100dvh;flex-direction:column;position:relative}
 #gps{background:#facc15;color:#000;padding:4px;text-align:center;font-size:10px;font-weight:bold}
 #console{background:#111;color:#22c55e;padding:3px;font-size:8px;min-height:20px;border-bottom:1px solid #facc15}
-canvas{flex:1;width:100%;background:#000;border:2px solid #facc15;display:block}
+canvas{flex:1;width:100%;background:#000;border:2px solid #facc15;display:block;min-height:300px}
 .btns{display:grid;grid-template-columns:36px 36px 36px 36px 1fr 56px;gap:3px;padding:3px;background:#0a0a0a}
 button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold}
 .bm{background:#222;color:#facc15}
@@ -31,7 +31,7 @@ button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 </head>
 <body>
 <div id="tela1">
-<div id="t1top">🛒 MONTE SUA LISTA - V55.3</div>
+<div id="t1top">🛒 V55.4 - MONTE SUA LISTA</div>
 <div id="t1lista">Toque + pra adicionar</div>
 <div id="t1produtos"></div>
 <div id="t1btns">
@@ -40,34 +40,12 @@ button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 </div>
 </div>
 <div id="tela2">
-<div id="gps">V55.3 - 13 GONDOLAS - PARA E CONFIRMA (FIX)</div>
-<div id="console">Pronto</div>
+<div id="gps">V55.4 - FIX TELA PRETA + CLONE</div>
+<div id="console">Carregando...</div>
 <canvas id="c"></canvas>
 <div id="modalPego">
 <div id="modalTexto" style="font-weight:bold">📍 CHEGOU!</div>
 <div id="modalProd" style="font-size:36px;margin:6px 0">🍚</div>
 <div id="modalNome" style="font-size:12px;font-weight:bold">ARROZ [25-26]</div>
 <div id="modalPreco" style="color:#16a34a;font-weight:bold;font-size:18px">R$ 22,90</div>
-<div id="modalProgress" style="font-size:9px;color:#666;margin:4px 0">Item 1 de 3</div>
-<button onclick="confirmarPego()" style="width:100%;height:44px;background:#22c55e;color:#000;border:2px solid #000;border-radius:10px;margin-top:8px;font-size:13px">✅ PEGUEI! PRÓXIMO →</button>
-<button onclick="pularItem()" style="width:100%;height:30px;background:#fff;color:#666;border:1px solid #ccc;border-radius:8px;margin-top:4px;font-size:10px">PULAR ESTE</button>
-</div>
-<div class="btns">
-<button class="bm" onclick="mover(-1,0)">←</button>
-<button class="bm" onclick="mover(0,-1)">↑</button>
-<button class="bm" onclick="mover(0,1)">↓</button>
-<button class="bm" onclick="mover(1,0)">→</button>
-<select id="combo" onchange="trocarProduto()"></select>
-<button class="bway" onclick="ir(26,15)">ENTRADA</button>
-</div>
-<div class="btns" style="padding-top:1px">
-<button onclick="voltarLista()" style="background:#333;color:#fff;font-size:8px">← LISTA</button>
-<button onclick="gerarRotaDaLista()" style="grid-column:span 2;background:#facc15;color:#000;font-size:10px">🗺️ INICIAR ROTA</button>
-<button onclick="proximoItem()" style="background:#22c55e;color:#000;font-size:8px">PRÓX →</button>
-<button class="bm" onclick="mover(0,-2)">↑↑</button>
-<button class="bm" onclick="mover(0,2)">↓↓</button>
-</div>
-</div>
-<script>
-const produtos=[
-{x:24,y:1,nome:"TANG",emo:"🧃",preco:"R$ 1,49",g:"1-2"},{x:2,y:2,nome:"ARROZ",emo:"🍚",preco:"R$ 22,90",g:"25-26"},{x:4,y:2,nome:"FEIJAO",emo:"🫘",preco:"R$ 8,99",g:"23-24"},{x:6,y:2,nome:"OLEO",emo:"🫒",preco:"R$ 7,49",g:"21-22"},{x:8,y:2,nome:"ACUCAR",emo:"🍬",preco:"R$ 4,99",g:"19-20"},{x:10,y:2,nome:"CAFE",emo:"☕",preco:"R$ 14,90",g:"17-18"},{x:12,y:2,nome:"MACARRAO",emo:"🍝",preco:"R$ 3,99",g:"15-16"},{x:14,y:2,nome:"BISCOITO",emo:"🍪",preco:"R$ 3,49",g:"13-14"},{x:16,y:2,nome:"LEITE",emo:"🥛",preco:"R$ 4,89",g:"11-12"},{x:18,y:2,nome:"MAN
+<div id="modalProgress" style="font-size:9px;color:#666;margin:4

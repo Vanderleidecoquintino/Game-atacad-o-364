@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>V55.2 PARA E PEGUEI</title>
+<title>V55.3 PARA E PEGUEI - CORRIGIDO</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;overflow:hidden}
@@ -30,9 +30,8 @@ button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 </style>
 </head>
 <body>
-
 <div id="tela1">
-<div id="t1top">🛒 MONTE SUA LISTA</div>
+<div id="t1top">🛒 MONTE SUA LISTA - V55.3</div>
 <div id="t1lista">Toque + pra adicionar</div>
 <div id="t1produtos"></div>
 <div id="t1btns">
@@ -40,9 +39,8 @@ button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 <button id="btnGo" onclick="irParaMercado()">🗺️ IR MERCADO (0)</button>
 </div>
 </div>
-
 <div id="tela2">
-<div id="gps">V55.2 - 13 GONDOLAS - PARA E CONFIRMA</div>
+<div id="gps">V55.3 - 13 GONDOLAS - PARA E CONFIRMA (FIX)</div>
 <div id="console">Pronto</div>
 <canvas id="c"></canvas>
 <div id="modalPego">
@@ -59,7 +57,7 @@ button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 <button class="bm" onclick="mover(0,-1)">↑</button>
 <button class="bm" onclick="mover(0,1)">↓</button>
 <button class="bm" onclick="mover(1,0)">→</button>
-<select id="combo"></select>
+<select id="combo" onchange="trocarProduto()"></select>
 <button class="bway" onclick="ir(26,15)">ENTRADA</button>
 </div>
 <div class="btns" style="padding-top:1px">
@@ -70,104 +68,6 @@ button{height:32px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 <button class="bm" onclick="mover(0,2)">↓↓</button>
 </div>
 </div>
-
 <script>
 const produtos=[
-{x:24,y:1,nome:"TANG",emo:"🧃",preco:"R$ 1,49",g:"1-2"},{x:2,y:2,nome:"ARROZ",emo:"🍚",preco:"R$ 22,90",g:"25-26"},{x:4,y:2,nome:"FEIJAO",emo:"🫘",preco:"R$ 8,99",g:"23-24"},{x:6,y:2,nome:"OLEO",emo:"🫒",preco:"R$ 7,49",g:"21-22"},{x:8,y:2,nome:"ACUCAR",emo:"🍬",preco:"R$ 4,99",g:"19-20"},{x:10,y:2,nome:"CAFE",emo:"☕",preco:"R$ 14,90",g:"17-18"},{x:12,y:2,nome:"MACARRAO",emo:"🍝",preco:"R$ 3,99",g:"15-16"},{x:14,y:2,nome:"BISCOITO",emo:"🍪",preco:"R$ 3,49",g:"13-14"},{x:16,y:2,nome:"LEITE",emo:"🥛",preco:"R$ 4,89",g:"11-12"},{x:18,y:2,nome:"MANTEIGA",emo:"🧈",preco:"R$ 9,90",g:"9-10"},{x:20,y:2,nome:"QUEIJO",emo:"🧀",preco:"R$ 29,90",g:"7-8"},{x:22,y:2,nome:"REFRI",emo:"🥤",preco:"R$ 8,99",g:"5-6"},{x:24,y:2,nome:"AGUA",emo:"💧",preco:"R$ 2,49",g:"3-4"},{x:2,y:5,nome:"CERVEJA",emo:"🍺",preco:"R$ 3,99",g:"25-26"},{x:4,y:5,nome:"SUCO",emo:"🧃",preco:"R$ 6,99",g:"23-24"},{x:6,y:5,nome:"ENERGETICO",emo:"⚡",preco:"R$ 7,99",g:"21-22"},{x:8,y:5,nome:"SABAO PO",emo:"🧼",preco:"R$ 12,90",g:"19-20"},{x:10,y:5,nome:"DETERGENTE",emo:"🧴",preco:"R$ 2,49",g:"17-18"},{x:12,y:5,nome:"AMACIANTE",emo:"👕",preco:"R$ 9,90",g:"15-16"},{x:14,y:5,nome:"DESINFETANTE",emo:"✨",preco:"R$ 6,99",g:"13-14"},{x:16,y:5,nome:"PAPEL HIG",emo:"🧻",preco:"R$ 15,90",g:"11-12"},{x:18,y:5,nome:"SABONETE",emo:"🧼",preco:"R$ 2,99",g:"9-10"},{x:20,y:5,nome:"SHAMPOO",emo:"💆",preco:"R$ 15,90",g:"7-8"},{x:22,y:5,nome:"CREME DENTAL",emo:"🪥",preco:"R$ 4,99",g:"5-6"},{x:24,y:5,nome:"DESODORANTE",emo:"💨",preco:"R$ 12,90",g:"3-4"},{x:2,y:10,nome:"PAO",emo:"🍞",preco:"R$ 0,89",g:"25-26"},{x:4,y:10,nome:"BOLO",emo:"🍰",preco:"R$ 6,90",g:"23-24"},{x:6,y:10,nome:"PRESUNTO",emo:"🍖",preco:"R$ 32,90",g:"21-22"},{x:8,y:10,nome:"MUSSARELA",emo:"🧀",preco:"R$ 39,90",g:"19-20"},{x:10,y:10,nome:"CARNE",emo:"🥩",preco:"R$ 29,90",g:"17-18"},{x:12,y:10,nome:"FRANGO",emo:"🍗",preco:"R$ 18,90",g:"15-16"},{x:14,y:10,nome:"LINGUICA",emo:"🌭",preco:"R$ 22,90",g:"13-14"},{x:16,y:10,nome:"OVOS",emo:"🥚",preco:"R$ 14,90",g:"11-12"},{x:18,y:10,nome:"TOMATE",emo:"🍅",preco:"R$ 7,90",g:"9-10"},{x:20,y:10,nome:"BATATA",emo:"🥔",preco:"R$ 5,90",g:"7-8"},{x:22,y:10,nome:"CEBOLA",emo:"🧅",preco:"R$ 4,90",g:"5-6"},{x:24,y:10,nome:"BANANA",emo:"🍌",preco:"R$ 6,90",g:"3-4"},{x:2,y:12,nome:"MACA",emo:"🍎",preco:"R$ 9,90",g:"25-26"},{x:4,y:12,nome:"RACAO CAO",emo:"🐶",preco:"R$ 89,90",g:"23-24"},{x:6,y:12,nome:"RACAO GATO",emo:"🐱",preco:"R$ 79,90",g:"21-22"},
-];
-let listaT1=[];
-function renderT1(){
- let cont=document.getElementById('t1produtos');cont.innerHTML='';
- produtos.forEach((p,i)=>{
-   let sel=listaT1.find(l=>l.x==p.x&&l.y==p.y);
-   let div=document.createElement('div');div.className='prod'+(sel?' sel':'');
-   div.innerHTML=`<div style="font-size:22px">${p.emo}</div><div style="font-size:9px;font-weight:bold">${p.nome}</div><div style="font-size:9px;color:#22c55e">${p.preco}</div><div style="font-size:7px;color:#facc15">[${p.g}]</div><button onclick="toggleProd(${i})">${sel?'✓ NA LISTA':'+ ADD'}</button>`;
-   cont.appendChild(div);
- });
- let bar=document.getElementById('t1lista');
- bar.innerHTML=listaT1.length==0?'Toque + pra adicionar':listaT1.map((l,i)=>`${i+1}. ${l.emo} ${l.nome}`).join(' | ')+` [${listaT1.length}]`;
- document.getElementById('btnGo').innerText=`🗺️ IR MERCADO (${listaT1.length})`;
- let combo=document.getElementById('combo');combo.innerHTML='';
- produtos.forEach(p=>{let o=document.createElement('option');o.value=p.x+','+p.y;o.innerText=`${p.emo} ${p.nome} [${p.g}]`;combo.appendChild(o);});
-}
-function toggleProd(i){let p=produtos[i];let idx=listaT1.findIndex(l=>l.x==p.x&&l.y==p.y);if(idx>=0) listaT1.splice(idx,1);else listaT1.push({...p});renderT1();}
-function limparT1(){listaT1=[];renderT1();}
-function irParaMercado(){if(!listaT1.length){alert('Add 1 produto');return;}document.getElementById('tela1').style.display='none';document.getElementById('tela2').style.display='flex';init();resize();draw();loop();setTimeout(()=>{gerarRotaDaLista();},400);}
-function voltarLista(){document.getElementById('tela2').style.display='none';document.getElementById('tela1').style.display='flex';if(tm){clearInterval(tm);tm=null;}document.getElementById('modalPego').style.display='none';}
-
-// V54.8 CORE
-const COLS=27,ROWS=19,W=40,H=26;
-let lab=[],dot=[],px=26,py=15,tx=26,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0;
-let precos={"TANG 364":"R$ 1,49","ARROZ 5KG":"R$ 22,90","FEIJAO 1KG":"R$ 8,99","OLEO 900ML":"R$ 7,49","ACUCAR 1KG":"R$ 4,99","CAFE 500G":"R$ 14,90","MACARRAO":"R$ 3,99","BISCOITO":"R$ 3,49","LEITE 1L":"R$ 4,89","MANTEIGA":"R$ 9,90","QUEIJO":"R$ 29,90","REFRI 2L":"R$ 8,99","AGUA 500ML":"R$ 2,49","CERVEJA":"R$ 3,99","SUCO CAIXA":"R$ 6,99","ENERGETICO":"R$ 7,99","SABAO PO":"R$ 12,90","DETERGENTE":"R$ 2,49","AMACIANTE":"R$ 9,90","DESINFETANTE":"R$ 6,99","PAPEL HIG":"R$ 15,90","SABONETE":"R$ 2,99","SHAMPOO":"R$ 15,90","CREME DENTAL":"R$ 4,99","DESODORANTE":"R$ 12,90","PAO FRANCES":"R$ 0,89","BOLO":"R$ 6,90","PRESUNTO":"R$ 32,90","MUSSARELA":"R$ 39,90","CARNE MOIDA":"R$ 29,90","FRANGO":"R$ 18,90","LINGUICA":"R$ 22,90","OVOS 12UN":"R$ 14,90","TOMATE":"R$ 7,90","BATATA":"R$ 5,90","CEBOLA":"R$ 4,90","BANANA":"R$ 6,90","MACA":"R$ 9,90","RACAO CAO":"R$ 89,90","RACAO GATO":"R$ 79,90"};
-let icons={"TANG 364":"🧃","ARROZ 5KG":"🍚","FEIJAO 1KG":"🫘","OLEO 900ML":"🫒","ACUCAR 1KG":"🍬","CAFE 500G":"☕","MACARRAO":"🍝","BISCOITO":"🍪","LEITE 1L":"🥛","MANTEIGA":"🧈","QUEIJO":"🧀","REFRI 2L":"🥤","AGUA 500ML":"💧","CERVEJA":"🍺","SUCO CAIXA":"🧃","ENERGETICO":"⚡","SABAO PO":"🧼","DETERGENTE":"🧴","AMACIANTE":"👕","DESINFETANTE":"✨","PAPEL HIG":"🧻","SABONETE":"🧼","SHAMPOO":"💆","CREME DENTAL":"🪥","DESODORANTE":"💨","PAO FRANCES":"🍞","BOLO":"🍰","PRESUNTO":"🍖","MUSSARELA":"🧀","CARNE MOIDA":"🥩","FRANGO":"🍗","LINGUICA":"🌭","OVOS 12UN":"🥚","TOMATE":"🍅","BATATA":"🥔","CEBOLA":"🧅","BANANA":"🍌","MACA":"🍎","RACAO CAO":"🐶","RACAO GATO":"🐱"};
-let produtoAtual="TANG 364";
-let caixas=[];for(let i=0;i<31;i++) caixas.push({id:i+1,fila:Math.floor(Math.random()*4)});
-let caixaAtual=null;
-function pegaCaixa(){caixas.sort((a,b)=>a.fila-b.fila);let c=caixas[0];c.fila++;setTimeout(()=>{c.fila=Math.max(0,c.fila-1)},20000);return c;}
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-let idxRota=0,esperando=false,listaOrdenada=[];
-function gerarRotaDaLista(){
- if(!listaT1.length) return;
- listaT1.forEach(l=>l.visitado=false);
- let resto=[...listaT1],atual={x:26,y:15},ordem=[];
- while(resto.length){resto.sort((a,b)=>(Math.abs(atual.x-a.x)+Math.abs(atual.y-a.y))-(Math.abs(atual.x-b.x)+Math.abs(atual.y-b.y)));let prox=resto.shift();ordem.push(prox);atual=prox;}
- listaOrdenada=ordem;idxRota=0;irParaProximoDaLista();
-}
-function irParaProximoDaLista(){
- if(idxRota>=listaOrdenada.length){
-   document.getElementById('console').innerText='🎉 LISTA COMPLETA!';
-   let total=listaOrdenada.reduce((s,p)=>s+parseFloat(p.preco.replace('R$','').replace(',','.')),0);
-   alert('🎉 FINALIZADO!\n'+listaOrdenada.length+' itens\nTotal R$ '+total.toFixed(2).replace('.',','));
-   return;
- }
- let alvo=listaOrdenada[idxRota];
- ir(alvo.x,alvo.y);
-}
-function mostrarModalPego(item){
- document.getElementById('modalProd').innerText=item.emo;
- document.getElementById('modalNome').innerText=item.nome+' ['+item.g+']';
- document.getElementById('modalPreco').innerText=item.preco;
- document.getElementById('modalTexto').innerText='📍 CHEGOU! ITEM '+(idxRota+1)+'/'+listaOrdenada.length;
- document.getElementById('modalProgress').innerText=(listaOrdenada.length-idxRota-1)+' itens restantes';
- document.getElementById('modalPego').style.display='block';
- if(navigator.vibrate) navigator.vibrate(200);
-}
-function confirmarPego(){let it=listaOrdenada[idxRota];it.visitado=true;document.getElementById('modalPego').style.display='none';idxRota++;esperando=false;setTimeout(()=>{irParaProximoDaLista();},500);}
-function pularItem(){document.getElementById('modalPego').style.display='none';idxRota++;irParaProximoDaLista();}
-function proximoItem(){if(esperando) confirmarPego(); else irParaProximoDaLista();}
-function trocarProduto(){let sel=document.getElementById('combo');if(!sel.value) return;let v=sel.value.split(',');ir(parseInt(v[0]),parseInt(v[1]));}
-function init(){lab=[];dot=[];for(let y=0;y<ROWS;y++){lab[y]=[];dot[y]=[];for(let x=0;x<COLS;x++){if(y==0||y==8||y==17||x==0||x==COLS-1) lab[y][x]=0; else if(x%2==1) lab[y][x]=1; else lab[y][x]=0; dot[y][x]=lab[y][x]==0;}}}
-function livre(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&lab[y][x]!=1}
-function achar(sx,sy,ex,ey){let q=[{x:sx,y:sy,p:[]}],v={};v[sx+','+sy]=1;while(q.length){let c=q.shift();if(c.x==ex&&c.y==ey)return c.p;for(let d of [[1,0],[-1,0],[0,1],[0,-1]]){let nx=c.x+d[0],ny=c.y+d[1],k=nx+','+ny;if(!v[k]&&livre(nx,ny)){v[k]=1;q.push({x:nx,y:ny,p:c.p.concat([{x:nx,y:ny}])})}}}return []}
-function resize(){let r=cv.getBoundingClientRect();vw=r.width;vh=r.height;if(vh<300) vh=400;cv.width=vw;cv.height=vh;draw();}
-function updateCam(){let tX=px*W - vw/2 + W/2, tY=py*H - vh/2 + H/2; camX+=(tX-camX)*0.12; camY+=(tY-camY)*0.12;let maxX=Math.max(0,COLS*W-vw),maxY=Math.max(0,ROWS*H-vh);if(camX<0) camX=0; if(camX>maxX) camX=maxX; if(camY<0) camY=0; if(camY>maxY) camY=maxY;}
-function draw(){
-  updateCam();ctx.fillStyle='#000';ctx.fillRect(0,0,vw,vh);ctx.save();ctx.translate(-camX,-camY);
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){if(lab[y][x]==1){ctx.fillStyle='#0a194e';ctx.fillRect(x*W,y*H,W,H);ctx.fillStyle='#1e40af';ctx.fillRect(x*W+1,y*H+1,W-2,H-2);ctx.fillStyle='#facc15';ctx.font='bold 10px Arial';let n='';if(x==25)n='1-2';else if(x==23)n='3-4';else if(x==21)n='5-6';else if(x==19)n='7-8';else if(x==17)n='9-10';else if(x==15)n='11-12';else if(x==13)n='13-14';else if(x==11)n='15-16';else if(x==9)n='17-18';else if(x==7)n='19-20';else if(x==5)n='21-22';else if(x==3)n='23-24';else if(x==1)n='25-26';ctx.fillText(n,x*W+3,y*H+16);}else if(dot[y][x]&&y!=0){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(x*W+20,y*H+13,2.5,0,6.28);ctx.fill();}}
-  ctx.fillStyle='#22c55e';ctx.fillRect(26*W-4,15*H-4,W+8,H+8);ctx.fillStyle='#000';ctx.font='bold 7px Arial';ctx.fillText('ENTRADA',26*W-3,15*H+4);
-  for(let i=0;i<rastro.length;i++){let p=rastro[i];let a=(i+1)/rastro.length;ctx.fillStyle='rgba(34,197,94,'+(0.4+a*0.6)+')';ctx.beginPath();ctx.arc(p.x*W+20,p.y*H+13,6*a+2,0,6.28);ctx.fill();}
-  if(!(tx==26&&ty==15)){ctx.fillStyle='#ef4444';ctx.fillRect(tx*W-2,ty*H-2,W+4,H+4);}
-  listaOrdenada.forEach((it,i)=>{if(it.visitado||i<idxRota) return;ctx.fillStyle=i==idxRota?'#facc15':'#ef4444';ctx.beginPath();ctx.arc(it.x*W+20,it.y*H+13,i==idxRota?12:9,0,6.28);ctx.fill();ctx.fillStyle=i==idxRota?'#000':'#fff';ctx.font='bold 10px Arial';ctx.textAlign='center';ctx.fillText(i+1,it.x*W+20,it.y*H+17);});
-  ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(px*W+20,py*H+13,11,0,6.28);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
-  ctx.restore();
-  let pend=listaOrdenada.filter(l=>!l.visitado).length;
-  document.getElementById('console').innerText=pend>0?`📍 Indo para ${idxRota+1}/${listaOrdenada.length} - ${listaOrdenada[idxRota]?.nome} - ${pend} restantes`:'🎉 Pronto!';
-}
-function step(){
- if(cam.length==0){
-   clearInterval(tm);tm=null;
-   let alvo=listaOrdenada[idxRota];
-   if(alvo&&px==alvo.x&&py==alvo.y&&!alvo.visitado&&!esperando){esperando=true;mostrarModalPego(alvo);}
-   draw();return;
- }
- let p=cam.shift();rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=p.x;py=p.y;dot[py][px]=false;draw();
-}
-function mover(dx,dy){if(tm){clearInterval(tm);tm=null;}let nx=px+dx,ny=py+dy;if(!livre(nx,ny))return;rastro.push({x:px,y:py});if(rastro.length>25) rastro.shift();px=nx;py=ny;dot[py][px]=false;draw();}
-function ir(x,y){if(tm){clearInterval(tm);tm=null;}if(x==26&&y==15) rastro=[];if(lab[y][x]==1){if(x>0&&lab[y][x-1]!=1) x--; else if(x<COLS-1&&lab[y][x+1]!=1) x++;}tx=x;ty=y;cam=achar(px,py,x,y);if(cam.length==0){px=x;py=y;draw();if(listaOrdenada[idxRota]&&px==listaOrdenada[idxRota].x&&py==listaOrdenada[idxRota].y){mostrarModalPego(listaOrdenada[idxRota]);esperando=true;}return;}tm=setInterval(step,110);draw();}
-function loop(){updateCam();draw();requestAnimationFrame(loop);}
-renderT1();
-let sx=0,sy=0;cv.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;});
-cv.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)<20&&Math.abs(dy)<20) return;if(Math.abs(dx)>Math.abs(dy))mover(dx>0?1:-1,0);else mover(0,dy>0?1:-1);});
-</script>
-</body>
-</html>
+{x:24,y:1,nome:"TANG",emo:"🧃",preco:"R$ 1,49",g:"1-2"},{x:2,y:2,nome:"ARROZ",emo:"🍚",preco:"R$ 22,90",g:"25-26"},{x:4,y:2,nome:"FEIJAO",emo:"🫘",preco:"R$ 8,99",g:"23-24"},{x:6,y:2,nome:"OLEO",emo:"🫒",preco:"R$ 7,49",g:"21-22"},{x:8,y:2,nome:"ACUCAR",emo:"🍬",preco:"R$ 4,99",g:"19-20"},{x:10,y:2,nome:"CAFE",emo:"☕",preco:"R$ 14,90",g:"17-18"},{x:12,y:2,nome:"MACARRAO",emo:"🍝",preco:"R$ 3,99",g:"15-16"},{x:14,y:2,nome:"BISCOITO",emo:"🍪",preco:"R$ 3,49",g:"13-14"},{x:16,y:2,nome:"LEITE",emo:"🥛",preco:"R$ 4,89",g:"11-12"},{x:18,y:2,nome:"MAN

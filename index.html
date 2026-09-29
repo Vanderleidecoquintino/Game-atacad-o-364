@@ -111,7 +111,7 @@ let idxRota=0,esperando=false,listaOrdenada=[];
 function mudaVel(d){
   vel+=d;
   if(vel<30) vel=30;
-  if(vel>800) vel=800;
+  if(vel>5000) vel=5000;
   document.getElementById('gps').innerText='V56.1 - VEL '+vel+'ms - '+(d<0?'MAIS RAPIDO':'MAIS DEVAGAR');
   if(tm){ clearInterval(tm); tm=setInterval(step,vel); }
 }

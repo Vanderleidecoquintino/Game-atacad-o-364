@@ -11,7 +11,7 @@ ola seja bem vindo! nosso mundo e se pá!
 
 - **Autor:** Vanderlei Deço Quintino (@vanderleidecoquintino)
 - **Criação:** 01 de Outubro de 2026
-- **Repositório:** github.com/vanderleidecoquintino/[NOME-DO-REPO]
+- **Repositório:** github.com/vanderleidecoquintino/gameatacadao364/
 - **Commits Git:** Carimbo de data/hora imutável fornecido pelo GitHub Inc. (EUA)
 - **Hash de prova:** Será gerado automaticamente pelo `git log`
 

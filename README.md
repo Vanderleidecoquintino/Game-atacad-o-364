@@ -25,9 +25,8 @@ Este projeto está em processo de registro de marca e software no INPI. Cópias 
 
 ---
 **Contato para licenciamento:** [decoquintino@gmail.com]
-whatsapp 1192340879
-CNPJ 11713473000152
+whatsapp 11992340879
+CNPJ 11713473/0001-52
 Vanderlei Roberto Quintino
-CPF 08925508892
 pronto pra luta!!!!
 e só vc querer.

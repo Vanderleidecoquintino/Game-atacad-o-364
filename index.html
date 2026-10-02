@@ -73,6 +73,20 @@ button{height:36px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 <button class="bm" onclick="mudaVel(40)">↓↓</button>
 </div>
 </div>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+  const firebaseConfig = { /* mesma config */ };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = "login.html"; }
+  });
+</script>
+
+ 
 <script>
 const produtos=[{x:24,y:1,nome:"TANG",emo:"🧃",preco:"R$ 1,49",g:"1-2"},{x:2,y:2,nome:"ARROZ",emo:"🍚",preco:"R$ 22,90",g:"25-26"},{x:4,y:2,nome:"FEIJAO",emo:"🫘",preco:"R$ 8,99",g:"23-24"},{x:6,y:2,nome:"OLEO",emo:"🫒",preco:"R$ 7,49",g:"21-22"},{x:8,y:2,nome:"ACUCAR",emo:"🍬",preco:"R$ 4,99",g:"19-20"},{x:10,y:2,nome:"CAFE",emo:"☕",preco:"R$ 14,90",g:"17-18"},{x:12,y:2,nome:"MACARRAO",emo:"🍝",preco:"R$ 3,99",g:"15-16"},{x:14,y:2,nome:"BISCOITO",emo:"🍪",preco:"R$ 3,49",g:"13-14"},{x:16,y:2,nome:"LEITE",emo:"🥛",preco:"R$ 4,89",g:"11-12"},{x:18,y:2,nome:"MANTEIGA",emo:"🧈",preco:"R$ 9,90",g:"9-10"},{x:20,y:2,nome:"QUEIJO",emo:"🧀",preco:"R$ 29,90",g:"7-8"},{x:22,y:2,nome:"REFRI",emo:"🥤",preco:"R$ 8,99",g:"5-6"},{x:24,y:2,nome:"AGUA",emo:"💧",preco:"R$ 2,49",g:"3-4"},{x:2,y:5,nome:"CERVEJA",emo:"🍺",preco:"R$ 3,99",g:"25-26"},{x:4,y:5,nome:"SUCO",emo:"🧃",preco:"R$ 6,99",g:"23-24"},{x:6,y:5,nome:"ENERGETICO",emo:"⚡",preco:"R$ 7,99",g:"21-22"},{x:8,y:5,nome:"SABAO PO",emo:"🧼",preco:"R$ 12,90",g:"19-20"},{x:10,y:5,nome:"DETERGENTE",emo:"🧴",preco:"R$ 2,49",g:"17-18"},{x:12,y:5,nome:"AMACIANTE",emo:"👕",preco:"R$ 9,90",g:"15-16"},{x:14,y:5,nome:"DESINFETANTE",emo:"✨",preco:"R$ 6,99",g:"13-14"},{x:16,y:5,nome:"PAPEL HIG",emo:"🧻",preco:"R$ 15,90",g:"11-12"},{x:18,y:5,nome:"SABONETE",emo:"🧼",preco:"R$ 2,99",g:"9-10"},{x:20,y:5,nome:"SHAMPOO",emo:"💆",preco:"R$ 15,90",g:"7-8"},{x:22,y:5,nome:"CREME DENTAL",emo:"🪥",preco:"R$ 4,99",g:"5-6"},{x:24,y:5,nome:"DESODORANTE",emo:"💨",preco:"R$ 12,90",g:"3-4"},{x:2,y:10,nome:"PAO",emo:"🍞",preco:"R$ 0,89",g:"25-26"},{x:4,y:10,nome:"BOLO",emo:"🍰",preco:"R$ 6,90",g:"23-24"},{x:6,y:10,nome:"PRESUNTO",emo:"🍖",preco:"R$ 32,90",g:"21-22"},{x:8,y:10,nome:"MUSSARELA",emo:"🧀",preco:"R$ 39,90",g:"19-20"},{x:10,y:10,nome:"CARNE",emo:"🥩",preco:"R$ 29,90",g:"17-18"},{x:12,y:10,nome:"FRANGO",emo:"🍗",preco:"R$ 18,90",g:"15-16"},{x:14,y:10,nome:"LINGUICA",emo:"🌭",preco:"R$ 22,90",g:"13-14"},{x:16,y:10,nome:"OVOS",emo:"🥚",preco:"R$ 14,90",g:"11-12"},{x:18,y:10,nome:"TOMATE",emo:"🍅",preco:"R$ 7,90",g:"9-10"},{x:20,y:10,nome:"BATATA",emo:"🥔",preco:"R$ 5,90",g:"7-8"},{x:22,y:10,nome:"CEBOLA",emo:"🧅",preco:"R$ 4,90",g:"5-6"},{x:24,y:10,nome:"BANANA",emo:"🍌",preco:"R$ 6,90",g:"3-4"},{x:2,y:12,nome:"MACA",emo:"🍎",preco:"R$ 9,90",g:"25-26"},{x:4,y:12,nome:"RACAO CAO",emo:"🐶",preco:"R$ 89,90",g:"23-24"},{x:6,y:12,nome:"RACAO GATO",emo:"🐱",preco:"R$ 79,90",g:"21-22"}];
 let listaT1=JSON.parse(localStorage.getItem('atacadao364_v56')||'[]');

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Mercado App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:Arial;">
+
+  <div style="text-align:center; border:1px solid #ddd; padding:30px; border-radius:12px;">
+    <h2>Bem-vindo ao Mercado App</h2>
+    <button id="btnGoogle" style="padding:12px 20px; border-radius:8px; border:1px solid #ccc; background:white; cursor:pointer; font-weight:bold;">
+      Entrar com Google
+    </button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBFqszMg6Z10iLu1DmNVqATymMNaPqut4",
+      authDomain: "mercado-app-b83c7.firebaseapp.com",
+      projectId: "mercado-app-b83c7",
+      storageBucket: "mercado-app-b83c7.firebasestorage.app",
+      messagingSenderId: "576399206797",
+      appId: "1:576399206797:web:5cfe2e7c4e5cc6b68df5c4",
+      measurementId: "G-0CZN5RK7RL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    document.getElementById("btnGoogle").addEventListener("click", () => {
+      signInWithPopup(auth, provider).then((result) => {
+        // Logou com sucesso, manda pro index
+        window.location.href = "index.html";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>V56.2 - BOTOES CENTRALIZADOS</title>
+<title>V56.1 - VELOCIDADE AJUSTAVEL</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#000;color:#fff;font-family:Arial;height:100dvh;overflow:hidden}
@@ -14,14 +14,9 @@ body{background:#000;color:#fff;font-family:Arial;height:100dvh;overflow:hidden}
 .prod{border:2px solid #333;background:#111;border-radius:12px;padding:8px;text-align:center}
 .prod.sel{border-color:#22c55e;background:#0a2a12}
 .prod button{width:100%;margin-top:5px;height:28px;border-radius:8px;border:1px solid #facc15;background:#facc15;color:#000;font-weight:bold;font-size:9px}
-
-/* AQUI ESTA O FIX DOS BOTOES CENTRALIZADOS */
-#t1btns{padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+#t1btns{padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 #t1btns button{height:44px;border-radius:10px;border:2px solid #facc15;font-weight:900;font-size:10px}
-.linha1{display:flex;justify-content:center;gap:6px;width:100%;max-width:400px}
-.linha1 button{flex:1}
-#btnGo{background:#22c55e;color:#000;width:100%;max-width:400px}
-
+#btnGo{background:#22c55e;color:#000;grid-column:span 2}
 #totalBar{background:#0a2a12;border-top:2px solid #22c55e;padding:6px;text-align:center;font-weight:900;color:#22c55e;font-size:13px}
 #tela2{display:none;height:100dvh;flex-direction:column;position:relative}
 #gps{background:#facc15;color:#000;padding:5px;text-align:center;font-size:10px;font-weight:bold}
@@ -37,23 +32,18 @@ button{height:36px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 </head>
 <body>
 <div id="tela1">
-<div id="t1top">🛒 ATACADÃO 364 - V56.2 BOTOES NO CENTRO</div>
+<div id="t1top">🛒 ATACADÃO 364 - V56.1 COM VELOCIDADE</div>
 <div id="t1lista">Toque + pra adicionar - Salva automático</div>
 <div id="t1produtos"></div>
 <div id="totalBar">TOTAL: R$ 0,00 (0 itens)</div>
-
-<!-- BOTOES AGORA 100% CENTRALIZADOS -->
 <div id="t1btns">
-  <div class="linha1">
-    <button onclick="limparT1()" style="background:#333;color:#fff">🗑️ LIMPAR</button>
-    <button onclick="salvarLista()" style="background:#1e40af;color:#fff">💾 SALVAR</button>
-  </div>
-  <button id="btnGo" onclick="irParaMercado()">🗺️ IR MERCADO (0)</button>
+<button onclick="limparT1()" style="background:#333;color:#fff">🗑️ LIMPAR</button>
+<button onclick="salvarLista()" style="background:#1e40af;color:#fff">💾 SALVAR</button>
+<button id="btnGo" onclick="irParaMercado()">🗺️ IR MERCADO (0)</button>
 </div>
-
 </div>
 <div id="tela2">
-<div id="gps">V56.2 - 13 GONDOLAS - VEL AJUSTAVEL</div>
+<div id="gps">V56.1 - 13 GONDOLAS - VEL AJUSTAVEL</div>
 <div id="console">Pronto</div>
 <canvas id="c"></canvas>
 <div id="modalPego">
@@ -84,10 +74,11 @@ button{height:36px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 </div>
 </div>
 
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-  const firebaseConfig = { apiKey: "SUA_API_KEY", authDomain: "SEU_AUTH_DOMAIN" };
+  const firebaseConfig = { /* mesma config */ };
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   onAuthStateChanged(auth, (user) => {
@@ -95,13 +86,16 @@ button{height:36px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
   });
 </script>
 
+ 
 <script>
 const produtos=[{x:24,y:1,nome:"TANG",emo:"🧃",preco:"R$ 1,49",g:"1-2"},{x:2,y:2,nome:"ARROZ",emo:"🍚",preco:"R$ 22,90",g:"25-26"},{x:4,y:2,nome:"FEIJAO",emo:"🫘",preco:"R$ 8,99",g:"23-24"},{x:6,y:2,nome:"OLEO",emo:"🫒",preco:"R$ 7,49",g:"21-22"},{x:8,y:2,nome:"ACUCAR",emo:"🍬",preco:"R$ 4,99",g:"19-20"},{x:10,y:2,nome:"CAFE",emo:"☕",preco:"R$ 14,90",g:"17-18"},{x:12,y:2,nome:"MACARRAO",emo:"🍝",preco:"R$ 3,99",g:"15-16"},{x:14,y:2,nome:"BISCOITO",emo:"🍪",preco:"R$ 3,49",g:"13-14"},{x:16,y:2,nome:"LEITE",emo:"🥛",preco:"R$ 4,89",g:"11-12"},{x:18,y:2,nome:"MANTEIGA",emo:"🧈",preco:"R$ 9,90",g:"9-10"},{x:20,y:2,nome:"QUEIJO",emo:"🧀",preco:"R$ 29,90",g:"7-8"},{x:22,y:2,nome:"REFRI",emo:"🥤",preco:"R$ 8,99",g:"5-6"},{x:24,y:2,nome:"AGUA",emo:"💧",preco:"R$ 2,49",g:"3-4"},{x:2,y:5,nome:"CERVEJA",emo:"🍺",preco:"R$ 3,99",g:"25-26"},{x:4,y:5,nome:"SUCO",emo:"🧃",preco:"R$ 6,99",g:"23-24"},{x:6,y:5,nome:"ENERGETICO",emo:"⚡",preco:"R$ 7,99",g:"21-22"},{x:8,y:5,nome:"SABAO PO",emo:"🧼",preco:"R$ 12,90",g:"19-20"},{x:10,y:5,nome:"DETERGENTE",emo:"🧴",preco:"R$ 2,49",g:"17-18"},{x:12,y:5,nome:"AMACIANTE",emo:"👕",preco:"R$ 9,90",g:"15-16"},{x:14,y:5,nome:"DESINFETANTE",emo:"✨",preco:"R$ 6,99",g:"13-14"},{x:16,y:5,nome:"PAPEL HIG",emo:"🧻",preco:"R$ 15,90",g:"11-12"},{x:18,y:5,nome:"SABONETE",emo:"🧼",preco:"R$ 2,99",g:"9-10"},{x:20,y:5,nome:"SHAMPOO",emo:"💆",preco:"R$ 15,90",g:"7-8"},{x:22,y:5,nome:"CREME DENTAL",emo:"🪥",preco:"R$ 4,99",g:"5-6"},{x:24,y:5,nome:"DESODORANTE",emo:"💨",preco:"R$ 12,90",g:"3-4"},{x:2,y:10,nome:"PAO",emo:"🍞",preco:"R$ 0,89",g:"25-26"},{x:4,y:10,nome:"BOLO",emo:"🍰",preco:"R$ 6,90",g:"23-24"},{x:6,y:10,nome:"PRESUNTO",emo:"🍖",preco:"R$ 32,90",g:"21-22"},{x:8,y:10,nome:"MUSSARELA",emo:"🧀",preco:"R$ 39,90",g:"19-20"},{x:10,y:10,nome:"CARNE",emo:"🥩",preco:"R$ 29,90",g:"17-18"},{x:12,y:10,nome:"FRANGO",emo:"🍗",preco:"R$ 18,90",g:"15-16"},{x:14,y:10,nome:"LINGUICA",emo:"🌭",preco:"R$ 22,90",g:"13-14"},{x:16,y:10,nome:"OVOS",emo:"🥚",preco:"R$ 14,90",g:"11-12"},{x:18,y:10,nome:"TOMATE",emo:"🍅",preco:"R$ 7,90",g:"9-10"},{x:20,y:10,nome:"BATATA",emo:"🥔",preco:"R$ 5,90",g:"7-8"},{x:22,y:10,nome:"CEBOLA",emo:"🧅",preco:"R$ 4,90",g:"5-6"},{x:24,y:10,nome:"BANANA",emo:"🍌",preco:"R$ 6,90",g:"3-4"},{x:2,y:12,nome:"MACA",emo:"🍎",preco:"R$ 9,90",g:"25-26"},{x:4,y:12,nome:"RACAO CAO",emo:"🐶",preco:"R$ 89,90",g:"23-24"},{x:6,y:12,nome:"RACAO GATO",emo:"🐱",preco:"R$ 79,90",g:"21-22"}];
 let listaT1=JSON.parse(localStorage.getItem('atacadao364_v56')||'[]');
+
 function falar(texto){if('speechSynthesis' in window){let u=new SpeechSynthesisUtterance(texto);u.lang='pt-BR';u.rate=1.1;speechSynthesis.cancel();speechSynthesis.speak(u);}}
 function falarLista(){if(!listaT1.length){falar('Lista vazia');return;}falar(`Sua lista tem ${listaT1.length} itens. ${listaT1.map(l=>l.nome).join(', ')}`);}
 function calcTotal(){return listaT1.reduce((s,p)=>s+parseFloat(p.preco.replace('R$','').replace(',','.')),0);}
 function salvarLista(){localStorage.setItem('atacadao364_v56',JSON.stringify(listaT1));document.getElementById('t1lista').innerHTML='💾 Lista salva no celular!';setTimeout(renderT1,1000);}
+
 function renderT1(){
  let cont=document.getElementById('t1produtos');cont.innerHTML='';
  produtos.forEach((p,i)=>{
@@ -122,11 +116,19 @@ function toggleProd(i){let p=produtos[i];let idx=listaT1.findIndex(l=>l.x==p.x&&
 function limparT1(){if(!confirm('Limpar lista?')) return;listaT1=[];localStorage.removeItem('atacadao364_v56');renderT1();}
 function irParaMercado(){if(!listaT1.length){alert('Adicione 1 produto!');return;}falar(`Iniciando rota com ${listaT1.length} itens, total ${calcTotal().toFixed(2)} reais`);document.getElementById('tela1').style.display='none';document.getElementById('tela2').style.display='flex';init();resize();draw();loop();setTimeout(()=>{gerarRotaDaLista();},400);}
 function voltarLista(){document.getElementById('tela2').style.display='none';document.getElementById('tela1').style.display='flex';if(tm){clearInterval(tm);tm=null;}document.getElementById('modalPego').style.display='none';}
+
+// MAPA V54.6 - COM CONTROLE DE VEL
 const COLS=27,ROWS=19,W=40,H=26;
 let lab=[],px=26,py=15,tx=26,ty=15,cam=[],tm=null,camX=0,camY=0,rastro=[],vw=0,vh=0,vel=250;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let idxRota=0,esperando=false,listaOrdenada=[];
-function mudaVel(d){vel+=d;if(vel<30) vel=30;if(vel>5000) vel=5000;document.getElementById('gps').innerText='V56.1 - VEL '+vel+'ms - '+(d<0?'MAIS RAPIDO':'MAIS DEVAGAR');if(tm){ clearInterval(tm); tm=setInterval(step,vel); }}
+function mudaVel(d){
+  vel+=d;
+  if(vel<30) vel=30;
+  if(vel>5000) vel=5000;
+  document.getElementById('gps').innerText='V56.1 - VEL '+vel+'ms - '+(d<0?'MAIS RAPIDO':'MAIS DEVAGAR');
+  if(tm){ clearInterval(tm); tm=setInterval(step,vel); }
+}
 function gerarRotaDaLista(){listaT1.forEach(l=>l.visitado=false);let resto=[...listaT1],atual={x:26,y:15},ordem=[];while(resto.length){resto.sort((a,b)=>(Math.abs(atual.x-a.x)+Math.abs(atual.y-a.y))-(Math.abs(atual.x-b.x)+Math.abs(atual.y-b.y)));let prox=resto.shift();ordem.push(prox);atual=prox;}listaOrdenada=ordem;idxRota=0;irParaProximoDaLista();}
 function irParaProximoDaLista(){if(idxRota>=listaOrdenada.length){let total=calcTotal();document.getElementById('console').innerText='🎉 LISTA COMPLETA!';falar(`Lista completa! ${listaOrdenada.length} itens, total ${total.toFixed(2)} reais. Indo para o caixa.`);alert(`🎉 FINALIZADO! ${listaOrdenada.length} itens - Total R$ ${total.toFixed(2).replace('.',',')}`);return;}ir(listaOrdenada[idxRota].x,listaOrdenada[idxRota].y);}
 function mostrarModalPego(item){

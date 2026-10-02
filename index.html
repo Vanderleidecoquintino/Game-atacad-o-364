@@ -75,6 +75,21 @@ button{height:36px;border-radius:8px;border:1.5px solid #facc15;font-weight:bold
 </div>
 
 <script type="module">
+
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Se não tá logado, manda pro login
+    window.location.href = "login.html";
+  } else {
+    console.log("Logado como:", user.email);
+    // aqui você carrega as listas dele
+  }
+});
+  
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
   const firebaseConfig = { /* mesma config */ };
